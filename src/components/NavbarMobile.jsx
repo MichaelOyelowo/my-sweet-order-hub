@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import logo from '../assets/logo.png'
 
-function NavbarMobile() {
+function NavbarMobile({ cartCount }) {
     const [menuOpen, setMenuOpen] = useState(false)
     const [searchOpen, setSearchOpen] = useState(false)
     const [activeLink, setActiveLink] = useState('Home')
-    const cartCount = 3
 
     const links = ['Home', 'Shop', 'Bundles', 'About', 'Contact']
 
