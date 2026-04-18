@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import NavbarMobile from './components/NavbarMobile'
 import Hero from './components/Hero'
@@ -6,32 +7,34 @@ import ChatStory from './components/ChatStory'
 import Marquee from './components/Marquee'
 import LeadModal from './components/LeadModal'
 import OrderSection from './components/OrderSection'
+import AdminPage from './pages/AdminPage'
 import './App.css'
 
 function App() {
-  const [cartItems, setCartItems] = useState([])
-  const [showCountdown, setShowCountdown] = useState(false);
-  // Check if user returned from WhatsApp
+  const [cartItems, setCartItems]       = useState([])
+  const [showCountdown, setShowCountdown] = useState(false)
+
+  // Show countdown timer when user returns from WhatsApp tab
   useEffect(() => {
-  const handleVisibility = () => {
-    if (document.visibilityState === 'visible') {
-      const ordered = sessionStorage.getItem('sweethub_ordered')
-      if (ordered === 'true') {
-        sessionStorage.removeItem('sweethub_ordered')
-        setTimeout(() => setShowCountdown(true), 600)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        const ordered = sessionStorage.getItem('sweethub_ordered')
+        if (ordered === 'true') {
+          sessionStorage.removeItem('sweethub_ordered')
+          setTimeout(() => setShowCountdown(true), 600)
+        }
       }
     }
-  }
-  document.addEventListener('visibilitychange', handleVisibility)
-  return () => document.removeEventListener('visibilitychange', handleVisibility)
-}, [])
-const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0)
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [])
 
-  const addToCart = (items) => {
-    setCartItems(items)
-  }
+  const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0)
 
-  return (
+  const addToCart = (items) => setCartItems(items)
+
+  // Main site layout
+  const MainSite = () => (
     <>
       <Navbar cartCount={cartCount} />
       <NavbarMobile cartCount={cartCount} />
@@ -46,8 +49,15 @@ const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0)
       />
     </>
   )
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/"      element={<MainSite />} />
+        <Route path="/admin" element={<AdminPage />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App
-
-
