@@ -10,11 +10,34 @@ import OrderSection from './components/OrderSection'
 import AdminPage from './pages/AdminPage'
 import './App.css'
 
-function App() {
-  const [cartItems, setCartItems]       = useState([])
-  const [showCountdown, setShowCountdown] = useState(false)
+// ── Main site layout ──────────────────────────────────────────
+// IMPORTANT: This must live OUTSIDE the App function.
+// If defined inside, React treats it as a new component on every
+// render and causes an infinite re-render loop.
+function MainSite({ cartCount, addToCart, showCountdown, setShowCountdown }) {
+  return (
+    <>
+      <Navbar cartCount={cartCount} />
+      <NavbarMobile cartCount={cartCount} />
+      <Hero />
+      <ChatStory />
+      <Marquee />
+      <LeadModal />
+      <OrderSection
+        onAddToCart={addToCart}
+        showCountdown={showCountdown}
+        setShowCountdown={setShowCountdown}
+      />
+    </>
+  )
+}
 
-  // Show countdown timer when user returns from WhatsApp tab
+// ── App — router + shared state ───────────────────────────────
+function App() {
+  const [cartItems, setCartItems]           = useState([])
+  const [showCountdown, setShowCountdown]   = useState(false)
+
+  // Show countdown when user returns from WhatsApp tab
   useEffect(() => {
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
@@ -30,30 +53,22 @@ function App() {
   }, [])
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0)
-
   const addToCart = (items) => setCartItems(items)
-
-  // Main site layout
-  const MainSite = () => (
-    <>
-      <Navbar cartCount={cartCount} />
-      <NavbarMobile cartCount={cartCount} />
-      <Hero />
-      <ChatStory />
-      <Marquee />
-      <LeadModal />
-      <OrderSection
-        onAddToCart={addToCart}
-        showCountdown={showCountdown}
-        setShowCountdown={setShowCountdown}
-      />
-    </>
-  )
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/"      element={<MainSite />} />
+        <Route
+          path="/"
+          element={
+            <MainSite
+              cartCount={cartCount}
+              addToCart={addToCart}
+              showCountdown={showCountdown}
+              setShowCountdown={setShowCountdown}
+            />
+          }
+        />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
