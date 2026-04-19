@@ -170,7 +170,7 @@ function UpsellToast({ product, pairProduct, onDismiss, onAddPair }) {
 
 
 // ── Checkout Modal ─────────────────────────────────────────────
-console.log('Key exists:', !!import.meta.env.VITE_RESEND_API_KEY)
+
 function CheckoutModal({ cartItems, onClose, onSuccess }) {
   const [form, setForm]       = useState({ name: '', phone: '', email: '', address: '', notes: '' })
   const [loading, setLoading] = useState(false)
@@ -181,7 +181,6 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
 
   // ── Send confirmation email via Resend ──────────────────────
   const sendEmail = async (orderRef) => {
-    const RESEND_KEY = import.meta.env.VITE_RESEND_API_KEY
 
     // Build the items rows for the email table
     const itemRows = cartItems.map(i => `
@@ -306,19 +305,19 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
 
     // Call Resend API directly
     try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${RESEND_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from:    'SweetHUB <onboarding@resend.dev>',
-          to:      [form.email],
-          subject: `Order ${orderRef} Confirmed 🎉 – SweetHUB`,
-          html,
-        }),
-      })
+          // No API Key needed here anymore! Just the worker URL.
+    await fetch('https://sweethub-emails.michaelkingreat.workers.dev', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from:    'SweetHUB <onboarding@resend.dev>', // Remember, use your verified Resend email to test!
+        to:      [form.email],
+        subject: `Order ${orderRef} Confirmed 🎉 – SweetHUB`,
+        html,
+      }),
+    })
     } catch (err) {
       // Email failure is non-critical — order still goes through
       console.warn('Email send failed (non-critical):', err)

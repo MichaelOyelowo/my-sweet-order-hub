@@ -5,9 +5,9 @@ import NavbarMobile from './components/NavbarMobile'
 import Hero from './components/Hero'
 import ChatStory from './components/ChatStory'
 import Marquee from './components/Marquee'
-import LeadModal from './components/LeadModal'
 import OrderSection from './components/OrderSection'
 import AdminPage from './pages/AdminPage'
+import PuzzleGame from './components/PuzzleGame'
 import './App.css'
 
 // ── Main site layout ──────────────────────────────────────────
@@ -22,12 +22,12 @@ function MainSite({ cartCount, addToCart, showCountdown, setShowCountdown }) {
       <Hero />
       <ChatStory />
       <Marquee />
-      <LeadModal />
       <OrderSection
         onAddToCart={addToCart}
         showCountdown={showCountdown}
         setShowCountdown={setShowCountdown}
       />
+      <PuzzleGame />
     </>
   )
 }
