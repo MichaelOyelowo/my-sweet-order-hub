@@ -170,25 +170,179 @@ function UpsellToast({ product, pairProduct, onDismiss, onAddPair }) {
 
 
 // ── Checkout Modal ─────────────────────────────────────────────
-// Collects customer details, saves to Supabase, then opens WhatsApp
+console.log('Key exists:', !!import.meta.env.VITE_RESEND_API_KEY)
 function CheckoutModal({ cartItems, onClose, onSuccess }) {
-  const [form, setForm]     = useState({ name: '', phone: '', address: '', notes: '' })
+  const [form, setForm]       = useState({ name: '', phone: '', email: '', address: '', notes: '' })
   const [loading, setLoading] = useState(false)
-  const [error, setError]   = useState('')
+  const [error, setError]     = useState('')
 
-  const total = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0)
+  const total  = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0)
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
+  // ── Send confirmation email via Resend ──────────────────────
+  const sendEmail = async (orderRef) => {
+    const RESEND_KEY = import.meta.env.VITE_RESEND_API_KEY
+
+    // Build the items rows for the email table
+    const itemRows = cartItems.map(i => `
+      <tr>
+        <td style="padding:10px 14px;border-bottom:1px solid #faf4ef;font-size:14px;color:#1a1a1a;">${i.name}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #faf4ef;font-size:14px;color:#888;text-align:center;">×${i.qty}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #faf4ef;font-size:14px;color:#c0392b;font-weight:700;text-align:right;">₦${(i.price * i.qty).toLocaleString()}</td>
+      </tr>
+    `).join('')
+
+    const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background:#f8f4f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f4f0;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+
+        <!-- Logo -->
+        <tr><td align="center" style="padding-bottom:24px;">
+          <h1 style="margin:0;font-size:32px;font-weight:800;color:#c0392b;letter-spacing:-1px;">Sweet<em>HUB</em></h1>
+          <p style="margin:4px 0 0;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em;">Fresh & Made to Order</p>
+        </td></tr>
+
+        <!-- Card -->
+        <tr><td style="background:white;border-radius:20px;overflow:hidden;">
+
+          <!-- Banner -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td style="background:#c0392b;padding:28px 32px;text-align:center;">
+              <div style="font-size:40px;margin-bottom:10px;">🎉</div>
+              <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:white;">Order Confirmed!</h2>
+              <p style="margin:0;font-size:14px;color:rgba(255,255,255,0.85);">We've received your order and we're getting started</p>
+            </td></tr>
+          </table>
+
+          <!-- Order ref -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td style="padding:24px 32px 0;text-align:center;">
+              <span style="display:inline-block;background:rgba(192,57,43,0.08);color:#c0392b;font-size:13px;font-weight:700;padding:6px 18px;border-radius:20px;letter-spacing:0.05em;">
+                Order ${orderRef}
+              </span>
+            </td></tr>
+          </table>
+
+          <!-- Greeting -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td style="padding:20px 32px 8px;">
+              <p style="margin:0;font-size:15px;color:#1a1a1a;line-height:1.6;">
+                Hi <strong>${form.name}</strong> 👋,<br/>
+                Thank you for your order! Here's a summary of what you ordered.
+                We'll send you a WhatsApp message shortly with payment details.
+              </p>
+            </td></tr>
+          </table>
+
+          <!-- Items table -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0 0;">
+            <tr><td style="padding:0 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #faf4ef;border-radius:12px;overflow:hidden;">
+                <thead>
+                  <tr style="background:#faf3ee;">
+                    <th style="padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;text-align:left;">Item</th>
+                    <th style="padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;text-align:center;">Qty</th>
+                    <th style="padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;text-align:right;">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>${itemRows}</tbody>
+                <tfoot>
+                  <tr style="background:#fff8f3;">
+                    <td colspan="2" style="padding:14px;font-size:15px;font-weight:700;color:#1a1a1a;">Total</td>
+                    <td style="padding:14px;font-size:18px;font-weight:800;color:#c0392b;text-align:right;">₦${total.toLocaleString()}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </td></tr>
+          </table>
+
+          <!-- Delivery info -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td style="padding:20px 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#faf7f4;border-radius:12px;">
+                <tr><td style="padding:16px;">
+                  <p style="margin:0 0 6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;">Delivery Address</p>
+                  <p style="margin:0;font-size:14px;color:#1a1a1a;">📍 ${form.address}</p>
+                  ${form.notes ? `<p style="margin:8px 0 0;font-size:13px;color:#888;">📝 ${form.notes}</p>` : ''}
+                </td></tr>
+              </table>
+            </td></tr>
+          </table>
+
+          <!-- Notice -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td style="padding:0 32px 28px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff8f0;border:1px solid #f0e6dc;border-radius:12px;">
+                <tr><td style="padding:14px 16px;font-size:13px;color:#888;line-height:1.6;">
+                  ⏱️ <strong style="color:#1a1a1a;">Preparation time:</strong>
+                  Please allow <strong style="color:#c0392b;">1 hour 30 minutes</strong> for your order to be freshly prepared.
+                  We will message you on WhatsApp when it's ready.
+                </td></tr>
+              </table>
+            </td></tr>
+          </table>
+
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="padding:24px 0 0;text-align:center;">
+          <p style="margin:0 0 4px;font-size:13px;color:#888;">
+            Questions? WhatsApp us at
+            <a href="https://wa.me/2349029702549" style="color:#c0392b;text-decoration:none;font-weight:600;">+234 902 970 2549</a>
+          </p>
+          <p style="margin:0;font-size:11px;color:#bbb;">© ${new Date().getFullYear()} SweetHUB · Fresh & Made to Order</p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+    // Call Resend API directly
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from:    'SweetHUB <onboarding@resend.dev>',
+          to:      [form.email],
+          subject: `Order ${orderRef} Confirmed 🎉 – SweetHUB`,
+          html,
+        }),
+      })
+    } catch (err) {
+      // Email failure is non-critical — order still goes through
+      console.warn('Email send failed (non-critical):', err)
+    }
+  }
+
+  // ── Main submit handler ─────────────────────────────────────
   const handleSubmit = async () => {
-    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
+    // Validate all required fields
+    if (!form.name.trim() || !form.phone.trim() || !form.email.trim() || !form.address.trim()) {
       setError('Please fill in all required fields.')
+      return
+    }
+
+    // Basic email format check
+    if (!/\S+@\S+\.\S+/.test(form.email)) {
+      setError('Please enter a valid email address.')
       return
     }
 
     setLoading(true)
     setError('')
 
-    // Build items payload for Supabase
+    // 1. Build items for Supabase
     const items = cartItems.map(i => ({
       id:    i.id,
       name:  i.name,
@@ -197,23 +351,24 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
       total: i.price * i.qty,
     }))
 
-    // Save order to Supabase
+    // 2. Save order to Supabase
     const { data, error: dbError } = await supabase
       .from('orders')
       .insert([{
         customer_name: form.name.trim(),
         phone:         form.phone.trim(),
+        email:         form.email.trim(),
         address:       form.address.trim(),
         notes:         form.notes.trim() || null,
         items,
         total,
-        status:        'Pending',
+        status: 'Pending',
       }])
       .select()
       .single()
 
     if (dbError) {
-      console.error(dbError)
+      console.error('Supabase error:', dbError)
       setError('Something went wrong saving your order. Please try again.')
       setLoading(false)
       return
@@ -221,16 +376,19 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
 
     const orderRef = data.order_ref
 
-    // Build WhatsApp message
+    // 3. Send confirmation email (non-blocking — runs in background)
+    sendEmail(orderRef)
+
+    // 4. Build WhatsApp message
     const lines = cartItems
-      .map(i => `• ${i.name} × ${i.qty} = ${fmt(i.price * i.qty)}`)
+      .map(i => `• ${i.name} × ${i.qty} = ₦${(i.price * i.qty).toLocaleString()}`)
       .join('\n')
 
     const msg =
       `Hello SweetHUB! 🍰 I just placed an order:\n\n` +
       `🔖 Order Ref: *${orderRef}*\n\n` +
       `${lines}\n\n` +
-      `*Total: ${fmt(total)}*\n\n` +
+      `*Total: ₦${total.toLocaleString()}*\n\n` +
       `👤 Name: ${form.name}\n` +
       `📞 Phone: ${form.phone}\n` +
       `📍 Address: ${form.address}\n` +
@@ -239,17 +397,22 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
 
     setLoading(false)
 
-    // Mark that they went to WhatsApp so countdown shows on return
+    // 5. Set session flags for countdown timer
     sessionStorage.setItem('sweethub_ordered', 'true')
     sessionStorage.setItem('sweethub_order_ref', orderRef)
 
+    // 6. Trigger success — clears cart, closes modal
     onSuccess(orderRef)
+
+    // 7. Open WhatsApp
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
+  // ── Render ──────────────────────────────────────────────────
   return (
     <div className="countdown-overlay" role="dialog" aria-modal="true" aria-label="Complete your order">
       <div className="checkout-modal">
+
         <button className="countdown-close" onClick={onClose} aria-label="Close">
           <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
             <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
@@ -259,7 +422,10 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
         <div className="checkout-modal-header">
           <div className="checkout-modal-icon">🛒</div>
           <h3 className="checkout-modal-title">Almost there!</h3>
-          <p className="checkout-modal-sub">Fill in your details so we know where to deliver your order.</p>
+          <p className="checkout-modal-sub">
+            Fill in your details — we'll send a confirmation to your email
+            and message you on WhatsApp with payment info.
+          </p>
         </div>
 
         {/* Order mini summary */}
@@ -267,16 +433,16 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
           {cartItems.map(i => (
             <div key={i.id} className="checkout-summary-row">
               <span>{i.name} × {i.qty}</span>
-              <span>{fmt(i.price * i.qty)}</span>
+              <span>₦{(i.price * i.qty).toLocaleString()}</span>
             </div>
           ))}
           <div className="checkout-summary-total">
             <span>Total</span>
-            <span>{fmt(total)}</span>
+            <span>₦{total.toLocaleString()}</span>
           </div>
         </div>
 
-        {/* Customer details form */}
+        {/* Customer form */}
         <div className="checkout-form">
           <div className="co-field">
             <label>Your Name *</label>
@@ -288,6 +454,7 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
               autoFocus
             />
           </div>
+
           <div className="co-field">
             <label>Phone Number *</label>
             <input
@@ -298,6 +465,18 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
               placeholder="e.g. 08012345678"
             />
           </div>
+
+          <div className="co-field">
+            <label>Email Address *</label>
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handle}
+              placeholder="e.g. amaka@gmail.com"
+            />
+          </div>
+
           <div className="co-field">
             <label>Delivery Address *</label>
             <input
@@ -307,13 +486,14 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
               placeholder="e.g. 12 Musa Street, Wuse 2, Abuja"
             />
           </div>
+
           <div className="co-field">
             <label>Extra Notes (optional)</label>
             <input
               name="notes"
               value={form.notes}
               onChange={handle}
-              placeholder="e.g. Call when you arrive, gate colour is blue..."
+              placeholder="e.g. Call when you arrive, gate is blue..."
             />
           </div>
         </div>
@@ -337,7 +517,10 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
           )}
         </button>
 
-        <p className="co-note">Your order will be saved and sent to us via WhatsApp.</p>
+        <p className="co-note">
+          A confirmation email will be sent automatically to your inbox.
+        </p>
+
       </div>
     </div>
   )
