@@ -36,7 +36,7 @@ import samosa1 from '../assets/samosa/samosa5.webp'
 // ── Gallery data — all real images connected ──────────────────
 const GALLERY_ITEMS = [
   { id: 1,  category: 'Cakes',  label: 'Red Velvet Cake',        tag: 'Fan Favourite', img: cake2,        height: 'tall'   },
-  { id: 2,  category: 'Snacks', label: 'Crunchy Chin-Chin',      tag: 'Best Seller',   img: chin,         height: 'short'  },
+  { id: 2,  category: 'Snacks', label: 'Crunchy Chin-Chin',      tag: 'Yummy',   img: chin,         height: 'short'  },
   { id: 3,  category: 'Pies',   label: 'Freshly Baked Meat Pie', tag: 'Hot 🔥',        img: meat_pie,     height: 'medium' },
   { id: 4,  category: 'Snacks', label: 'Glazed Doughnuts',       tag: 'New Taste',   img: dough1,       height: 'short'  },
   { id: 5,  category: 'Cakes',  label: 'Birthday Layer Cake',    tag: 'Custom Order',  img: cake1,        height: 'tall'   },

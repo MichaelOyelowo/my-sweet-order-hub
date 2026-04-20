@@ -9,6 +9,7 @@ import OrderSection from './components/OrderSection'
 import AdminPage from './pages/AdminPage'
 import PuzzleGame from './components/PuzzleGame'
 import Gallery from './components/Gallery.jsx'
+import WhySweetHub from './components/WhySweetHub'
 import './App.css'
 
 // ── Main site layout ──────────────────────────────────────────
@@ -30,6 +31,7 @@ function MainSite({ cartCount, addToCart, showCountdown, setShowCountdown }) {
       />
       <PuzzleGame />
       <Gallery/>
+      <WhySweetHub />
     </>
   )
 }
