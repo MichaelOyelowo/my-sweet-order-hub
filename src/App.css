@@ -3642,6 +3642,505 @@
 }
 
 
+/* ══════════════════════════════
+   PHOTO GALLERY SECTION
+   ══════════════════════════════ */
+
+.gallery-section {
+  background: var(--bg);
+  padding: 100px 24px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.gallery-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(192, 57, 43, 0.2),
+    transparent
+  );
+}
+
+/* ── Header ── */
+.gallery-header {
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto 36px;
+}
+
+.gallery-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.gallery-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.15;
+  margin-bottom: 14px;
+  letter-spacing: -0.5px;
+}
+
+.gallery-heading em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.gallery-sub {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* ── Filters ── */
+.gallery-filters {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.gallery-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.gfb-emoji { font-size: 15px; }
+
+.gallery-filter-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(192, 57, 43, 0.04);
+}
+
+.gallery-filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 4px 14px rgba(192, 57, 43, 0.28);
+}
+
+/* Count text */
+.gallery-showing {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.gallery-showing strong { color: var(--text); }
+
+/* ── Masonry grid ── */
+.gallery-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  columns: 3;
+  column-gap: 14px;
+  transition: opacity 0.2s ease;
+}
+
+.gallery-grid.animating {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Gallery card ── */
+.gallery-card {
+  break-inside: avoid;
+  margin-bottom: 14px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease,
+    box-shadow 0.3s ease;
+  background: #f0e8e0;
+}
+
+.gallery-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.gallery-card:hover {
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.16);
+  transform: translateY(-3px);
+}
+
+/* Skeleton shimmer */
+.gallery-skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #f0e8e0 25%,
+    #fdf4ee 50%,
+    #f0e8e0 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  z-index: 1;
+  border-radius: 16px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Card heights */
+.gallery-card--short  { min-height: 180px; }
+.gallery-card--medium { min-height: 240px; }
+.gallery-card--tall   { min-height: 320px; }
+
+/* Image container */
+.gallery-card-img {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.gallery-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  min-height: inherit;
+  transition:
+    transform 0.5s ease,
+    opacity 0.4s ease;
+}
+
+.gallery-card:hover .gallery-card-img img {
+  transform: scale(1.06);
+}
+
+/* Image fallback */
+.gallery-img-fallback {
+  width: 100%;
+  min-height: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #fde8d0, #f5c4a0);
+  font-size: 48px;
+}
+
+/* Tag badge */
+.gallery-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  z-index: 4;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Hover overlay */
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(45, 26, 14, 0.9) 0%,
+    rgba(45, 26, 14, 0.3) 45%,
+    transparent 100%
+  );
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 3;
+}
+
+.gallery-card:hover .gallery-overlay { opacity: 1; }
+
+.gallery-overlay-inner {
+  padding: 14px 16px;
+  transform: translateY(6px);
+  transition: transform 0.3s ease;
+  width: 100%;
+}
+
+.gallery-card:hover .gallery-overlay-inner { transform: translateY(0); }
+
+.gallery-overlay-category {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 3px;
+}
+
+.gallery-overlay-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.3;
+  font-family: var(--font-heading);
+}
+
+/* ── Load more ── */
+.gallery-load-more-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.gallery-load-more {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 12px;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gallery-load-more:hover {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 6px 20px rgba(192, 57, 43, 0.25);
+  transform: translateY(-1px);
+}
+
+.gallery-load-more.ghost {
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.gallery-load-more.ghost:hover {
+  background: var(--text-muted);
+  border-color: var(--text-muted);
+  color: white;
+  box-shadow: none;
+}
+
+.gallery-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ══════════════════════════════
+   GLOWING CTA SECTION (PRO GLASSMORPHISM + CRAZY HOVER)
+   ══════════════════════════════ */
+
+.gallery-cta-wrapper {
+  position: relative;
+  width: 90%;
+  max-width: 1100px;
+  margin: 56px auto;
+  border-radius: 20px;
+  z-index: 1;
+  /* Smooth scale transition for the whole wrapper */
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Make the whole card pop out slightly when they touch it */
+.gallery-cta-wrapper:hover {
+  transform: scale(1.02);
+}
+
+/* 1. THE AMBIENT GLOW (Only casts light from the corners) */
+.gallery-cta-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: -15px; 
+  border-radius: 24px;
+  z-index: -1;
+  background: linear-gradient(
+    135deg, 
+    var(--accent) 0%, 
+    #e74c3c 15%,
+    transparent 35%, 
+    transparent 65%, 
+    #ffb84d 85%,
+    #f39c12 100%
+  );
+  filter: blur(25px);
+  opacity: 0.4;
+  /* Tell the glow to animate smoothly when the color changes */
+  transition: filter 0.6s ease, opacity 0.6s ease;
+}
+
+/* 🚨 THE CRAZY EASTER EGG GLOW 🚨 */
+.gallery-cta-wrapper:hover::before {
+  /* Rotates the warm colors into vibrant Neon Blue/Purple! */
+  filter: blur(35px) hue-rotate(240deg) saturate(2);
+  opacity: 0.8; /* Makes the crazy color shine brighter */
+}
+
+/* 2. THE FROSTED GLASS CARD */
+.gallery-cta-card {
+  background: rgba(255, 255, 255, 0.4); 
+  backdrop-filter: blur(24px); 
+  -webkit-backdrop-filter: blur(24px);
+  width: 100%;
+  padding: 50px 24px;
+  border-radius: 20px;
+  text-align: center;
+  position: relative;
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 8px 32px rgba(0, 0, 0, 0.04);
+}
+
+/* 3. THE SHARP GRADIENT BORDER (Advanced CSS Masking) */
+.gallery-cta-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 2px; 
+  background: linear-gradient(
+    135deg, 
+    var(--accent) 0%, 
+    #e74c3c 20%, 
+    transparent 45%, 
+    transparent 55%, 
+    #ffb84d 80%, 
+    #f39c12 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  /* Make the border animate smoothly alongside the glow */
+  transition: filter 0.6s ease;
+}
+
+/* 🚨 THE CRAZY EASTER EGG BORDER 🚨 */
+.gallery-cta-wrapper:hover .gallery-cta-card::after {
+  /* Shifts the border colors to match the neon glow */
+  filter: hue-rotate(240deg) saturate(2);
+}
+
+/* Text inside */
+.gallery-cta-card p {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text); 
+  margin-bottom: 24px;
+  font-family: var(--font-heading);
+  letter-spacing: -0.5px;
+}
+
+/* 4. THE BUTTON (Keeps the sleek light-sweep hover effect) */
+.gallery-cta-btn {
+  position: relative; 
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  overflow: hidden; 
+  /* Added a background transition so it matches the crazy theme! */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.6s ease, filter 0.6s ease;
+  z-index: 1;
+}
+
+/* Make the button join the neon party! */
+.gallery-cta-wrapper:hover .gallery-cta-btn {
+  filter: hue-rotate(240deg) saturate(1.5);
+}
+
+.gallery-cta-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+  z-index: 2; 
+  pointer-events: none;
+}
+
+.gallery-cta-btn:hover::before {
+  left: 150%;
+  transition: left 0.6s ease;
+}
+
+.gallery-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(192, 57, 43, 0.35);
+}
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .gallery-section { padding: 60px 14px 60px; }
+
+  .gallery-grid {
+    columns: 2;
+    column-gap: 10px;
+  }
+
+  .gallery-card       { margin-bottom: 10px; }
+  .gallery-card--short  { min-height: 140px; }
+  .gallery-card--medium { min-height: 190px; }
+  .gallery-card--tall   { min-height: 240px; }
+
+  /* Always show overlay on mobile — no hover on touch */
+  .gallery-overlay        { opacity: 1; }
+  .gallery-overlay-inner  { transform: translateY(0); }
+
+  .gallery-cta { margin-top: 32px; padding: 24px 16px; }
+  .gallery-cta p { font-size: 15px; }
+}
+
+@media (max-width: 400px) {
+  .gallery-grid { columns: 2; column-gap: 8px; }
+}
+
 
 /* ==========================================================================
    ALL MEDIA QUERIES (Arranged Largest to Smallest)

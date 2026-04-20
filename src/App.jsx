@@ -8,6 +8,7 @@ import Marquee from './components/Marquee'
 import OrderSection from './components/OrderSection'
 import AdminPage from './pages/AdminPage'
 import PuzzleGame from './components/PuzzleGame'
+import Gallery from './components/Gallery.jsx'
 import './App.css'
 
 // ── Main site layout ──────────────────────────────────────────
@@ -28,6 +29,7 @@ function MainSite({ cartCount, addToCart, showCountdown, setShowCountdown }) {
         setShowCountdown={setShowCountdown}
       />
       <PuzzleGame />
+      <Gallery/>
     </>
   )
 }
