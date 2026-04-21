@@ -6,10 +6,12 @@ import Hero from './components/Hero'
 import ChatStory from './components/ChatStory'
 import Marquee from './components/Marquee'
 import OrderSection from './components/OrderSection'
-import AdminPage from './pages/AdminPage'
-import PuzzleGame from './components/PuzzleGame'
+// import PuzzleGame from './components/PuzzleGame'
 import Gallery from './components/Gallery.jsx'
+import GameTeaser from './components/GameTeaser.jsx'
 import WhySweetHub from './components/WhySweetHub'
+import GamesPage from './pages/GamesPage'
+import AdminPage from './pages/AdminPage'
 import './App.css'
 
 // ── Main site layout ──────────────────────────────────────────
@@ -29,9 +31,21 @@ function MainSite({ cartCount, addToCart, showCountdown, setShowCountdown }) {
         showCountdown={showCountdown}
         setShowCountdown={setShowCountdown}
       />
-      <PuzzleGame />
+      {/* <PuzzleGame /> */}
       <Gallery/>
+      <GameTeaser/>
       <WhySweetHub />
+    </>
+  )
+}
+
+// ── Games page wrapper (has its own navbar) ───────────────────
+function GamesLayout({ cartCount }) {
+  return (
+    <>
+      <Navbar cartCount={cartCount} />
+      <NavbarMobile cartCount={cartCount} />
+      <GamesPage />
     </>
   )
 }
@@ -73,6 +87,7 @@ function App() {
             />
           }
         />
+        <Route path="/games" element={<GamesLayout cartCount={cartCount} />} />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>

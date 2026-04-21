@@ -34,10 +34,6 @@ const LINES = [
   { text: '  Order now. ↓',                   color: '#e74c3c', speed: 80 },
 ]
 
-// ── Customers — replace src with your real photos ─────────────
-// Add photos to src/assets/customers/ and import them at the top
-// e.g: import amaka from '../assets/customers/amaka.webp'
-// Then set img: amaka on the customer object
 const CUSTOMERS = [
   {
     id: 1,
