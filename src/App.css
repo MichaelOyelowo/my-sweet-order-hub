@@ -4186,7 +4186,7 @@
   font-style: italic;
 }
 
-/* ── Body — two columns ── */
+/* ── Two column body ── */
 .why-body {
   max-width: 1100px;
   margin: 0 auto;
@@ -4197,7 +4197,7 @@
 }
 
 /* ══════════════════════════════
-   TERMINAL (ESPRESSO KITCHEN TICKET THEME)
+   TERMINAL — ESPRESSO THEME
    ══════════════════════════════ */
 
 .why-terminal-wrap {
@@ -4206,45 +4206,35 @@
 }
 
 .why-terminal {
-  background: #23110b; /* Deep, rich espresso brown instead of hacker black */
+  background: #23110b;
   border-radius: 16px;
   overflow: hidden;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 32px 64px rgba(0, 0, 0, 0.25),
-    0 8px 24px rgba(192, 57, 43, 0.15); /* Warmer shadow */
+    0 0 0 1px rgba(255,255,255,0.08),
+    0 32px 64px rgba(0,0,0,0.25),
+    0 8px 24px rgba(192,57,43,0.15);
 }
 
-/* Title bar */
 .why-terminal-bar {
-  background: #140905; /* Darker chocolate for the header */
+  background: #140905;
   padding: 11px 16px;
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.why-terminal-dots {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
+.why-terminal-dots { display: flex; gap: 6px; flex-shrink: 0; }
 
-.wtd {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.wtd-red    { background: #ff5f57; }
-.wtd-yellow { background: #febc2e; }
-.wtd-green  { background: #28c840; }
+.wtd              { width: 12px; height: 12px; border-radius: 50%; }
+.wtd-red          { background: #ff5f57; }
+.wtd-yellow       { background: #febc2e; }
+.wtd-green        { background: #28c840; }
 
 .why-terminal-title {
   flex: 1;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255,255,255,0.4);
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
   text-align: center;
   letter-spacing: 0.3px;
@@ -4255,12 +4245,11 @@
   font-family: monospace;
   padding: 2px 8px;
   border-radius: 4px;
-  background: rgba(255, 184, 77, 0.15); /* Warm gold background */
-  color: #ffb84d; /* Warm gold text */
+  background: rgba(255,184,77,0.15);
+  color: #ffb84d;
   letter-spacing: 0.3px;
 }
 
-/* Body */
 .why-terminal-body {
   padding: 20px 24px 24px;
   min-height: 360px;
@@ -4268,8 +4257,7 @@
   font-size: 13.5px;
   line-height: 1.9;
   background: #23110b;
-  /* Faint gold grid lines instead of white */
-  background-image: linear-gradient(rgba(255, 184, 77, 0.03) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(255,184,77,0.03) 1px, transparent 1px);
   background-size: 100% 1.9em;
 }
 
@@ -4281,36 +4269,25 @@
   word-break: break-word;
 }
 
-.wt-prompt {
-  font-weight: 600;
-  letter-spacing: 0.2px;
-}
+.wt-prompt { font-weight: 600; letter-spacing: 0.2px; }
+.wt-body   { font-weight: 400; letter-spacing: 0.2px; }
 
-.wt-body {
-  font-weight: 400;
-  letter-spacing: 0.2px;
-}
-
-/* Blinking cursor */
 .why-cursor {
   display: inline-block;
-  color: var(--accent); /* Changed to your brand Red! */
-  font-weight: 400;
+  color: var(--accent);
   transition: opacity 0.08s;
   margin-left: 1px;
-  animation: none;
 }
 
-/* Terminal footer */
 .why-terminal-footer {
   background: #140905;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255,255,255,0.05);
   padding: 8px 16px;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255,255,255,0.3);
   font-family: monospace;
 }
 
@@ -4318,164 +4295,181 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #ffb84d; /* Warm gold dot */
-  box-shadow: 0 0 6px rgba(255, 184, 77, 0.6);
+  background: #ffb84d;
+  box-shadow: 0 0 6px rgba(255,184,77,0.6);
   flex-shrink: 0;
 }
 
 /* ══════════════════════════════
-   TRUST CARDS
+   ORBITAL REVIEWS
    ══════════════════════════════ */
 
-/* ══════════════════════════════
-   TRUST CARDS (PREMIUM FROSTED GLASS)
-   ══════════════════════════════ */
-
-.why-cards-wrap {
+.orbital-wrap {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 24px;
 }
 
-.why-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.orbital-svg-container {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
-.why-card {
-  /* Frosted glass effect instead of solid white */
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 20px;
-  padding: 24px;
-  /* Premium double-layered border trick */
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 
-    inset 0 1px 1px rgba(255, 255, 255, 0.9),
-    0 8px 32px rgba(192, 57, 43, 0.03); /* Extremely soft, warm ambient shadow */
+.orbital-svg {
+  width: 100%;
+  height: 320px;
+  overflow: visible;
+  display: block;
+}
+
+/* ── Featured center card ── */
+.orbital-featured {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  text-align: center;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.orbital-featured.fading {
   opacity: 0;
-  transform: translateX(30px);
-  transition:
-    opacity 0.5s ease,
-    transform 0.5s ease,
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+  transform: translate(-50%, -46%);
 }
 
-.why-card.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.why-card:hover {
-  /* Shadow deepens and warms up on hover */
-  box-shadow: 0 12px 40px rgba(192, 57, 43, 0.08);
-  transform: translateY(-3px);
-  /* The border gets a subtle golden tint */
-  border-color: rgba(255, 184, 77, 0.3);
-}
-
-/* Icons, Typography & Stats (Your existing code, just perfectly spaced) */
-.why-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-.why-card-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Avatar */
+.of-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  overflow: hidden;
+  margin: 0 auto 6px;
+  transition: border-color 0.3s, box-shadow 0.3s;
   flex-shrink: 0;
 }
 
-.why-card-stat-wrap {
-  text-align: right;
-}
-
-.why-card-stat {
+.of-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  font-family: var(--font-heading);
-  font-size: 26px;
+}
+
+/* Placeholder when no photo yet */
+.of-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
   font-weight: 800;
-  line-height: 1;
-  margin-bottom: 3px;
-}
-
-.why-card-stat-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.why-card-title {
+  color: white;
   font-family: var(--font-heading);
-  font-size: 18px;
+}
+
+.of-name {
+  font-size: 13px;
   font-weight: 800;
   color: var(--text);
-  margin-bottom: 8px;
+  margin-bottom: 1px;
+  font-family: var(--font-heading);
+  line-height: 1.2;
 }
 
-.why-card-desc {
-  font-size: 14px;
+.of-location {
+  font-size: 9.5px;
   color: var(--text-muted);
-  line-height: 1.65;
+  margin-bottom: 6px;
+  font-weight: 500;
 }
+
+.of-review {
+  font-size: 10px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 5px;
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.of-order {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.of-stars {
+  color: #ffb84d;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
 /* ══════════════════════════════
-   BOTTOM CTA (DARK VIP SIBLING)
+   VIP CTA — inherits why-cta
    ══════════════════════════════ */
 
+.orbital-cta {
+  width: 100%;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  transition: box-shadow 0.4s ease, transform 0.3s ease !important;
+}
+
+/* ── Base why-cta styles (used by orbital-cta) ── */
 .why-cta {
   position: relative;
-  /* Deep chocolate/espresso dark background */
   background: linear-gradient(135deg, #1a100c 0%, #0a0503 100%);
   border-radius: 20px;
   padding: 36px 24px;
   text-align: center;
   opacity: 0;
   transform: translateY(16px);
-  /* Added box-shadow to the transition so the hover lift is smooth */
   transition: opacity 0.6s ease 0.4s, transform 0.6s ease 0.4s, box-shadow 0.4s ease;
   z-index: 1;
-  overflow: hidden; /* Keeps the hover shimmer inside the box */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-/* Entrance Animation state (Your existing logic) */
 .why-cta.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* The Hover Lift (Targeting .visible so it doesn't break your entrance animation!) */
 .why-cta.visible:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(192, 57, 43, 0.15);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3), 0 0 30px rgba(192,57,43,0.15);
 }
 
-/* 1. CONSISTENT SHARP BORDER (Advanced Masking Trick!) */
+/* Gradient border */
 .why-cta::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: 20px;
-  padding: 1.5px; /* Ultra-thin premium border */
-  /* Gold to Red gradient border */
+  padding: 1.5px;
   background: linear-gradient(
-    135deg, 
-    #ffb84d 0%, 
-    var(--accent) 30%, 
-    transparent 50%, 
-    transparent 70%, 
-    var(--accent) 90%, 
+    135deg,
+    #ffb84d 0%,
+    var(--accent) 30%,
+    transparent 50%,
+    transparent 70%,
+    var(--accent) 90%,
     #ffb84d 100%
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -4485,7 +4479,7 @@
   pointer-events: none;
 }
 
-/* 2. THE VIP SHIMMER (Sweeps a soft gold light across the dark card) */
+/* Shimmer sweep */
 .why-cta::after {
   content: '';
   position: absolute;
@@ -4493,22 +4487,18 @@
   left: -150%;
   width: 100%;
   height: 100%;
-  /* A very soft, translucent gold sheen */
-  background: linear-gradient(90deg, transparent, rgba(255, 184, 77, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,184,77,0.08), transparent);
   transform: skewX(-20deg);
   transition: left 0.7s ease;
-  z-index: -1; 
+  z-index: -1;
   pointer-events: none;
 }
 
-.why-cta.visible:hover::after {
-  left: 150%;
-}
+.why-cta.visible:hover::after { left: 150%; }
 
-/* 3. TYPOGRAPHY */
 .why-cta p:first-of-type {
   font-family: var(--font-heading);
-  font-size: 22px; 
+  font-size: 22px;
   font-weight: 800;
   color: #ffffff;
   margin-bottom: 8px;
@@ -4519,11 +4509,11 @@
   font-size: 14px !important;
   font-family: inherit !important;
   font-weight: 500 !important;
-  color: rgba(255, 255, 255, 0.6) !important;
+  color: rgba(255,255,255,0.6) !important;
   margin-bottom: 24px !important;
 }
 
-/* 4. THE BUTTON (Perfectly consistent with your other CTA) */
+/* CTA button */
 .why-cta-btn {
   position: relative;
   display: inline-flex;
@@ -4536,7 +4526,7 @@
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
-  overflow: hidden; 
+  overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.2s;
   z-index: 1;
 }
@@ -4548,21 +4538,19 @@
   left: -150%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
   transform: skewX(-20deg);
   transition: left 0.5s ease;
-  z-index: 2; 
+  z-index: 2;
   pointer-events: none;
 }
 
-.why-cta-btn:hover::before {
-  left: 150%;
-}
+.why-cta-btn:hover::before { left: 150%; }
 
 .why-cta-btn:hover {
   background: var(--accent-h);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(192, 57, 43, 0.4);
+  box-shadow: 0 8px 24px rgba(192,57,43,0.4);
 }
 
 /* ── Mobile ── */
@@ -4571,22 +4559,24 @@
     grid-template-columns: 1fr;
     gap: 36px;
   }
-
-  .why-terminal-wrap {
-    position: static;
-  }
-
-  .why-section { padding: 60px 20px; }
-
-  .why-terminal-body {
-    min-height: 280px;
-    font-size: 12px;
-  }
+  .why-terminal-wrap  { position: static; }
+  .why-section        { padding: 60px 20px; }
+  .why-terminal-body  { min-height: 280px; font-size: 12px; }
+  .orbital-svg-container { max-width: 280px; }
+  .orbital-svg        { height: 280px; }
+  .orbital-featured   { width: 126px; }
+  .of-review          { font-size: 9px; }
+  .of-name            { font-size: 12px; }
+  .of-avatar          { width: 42px; height: 42px; }
 }
 
 @media (max-width: 480px) {
-  .why-terminal-body { font-size: 11.5px; padding: 16px; }
+  .why-terminal-body  { font-size: 11.5px; padding: 16px; }
   .why-terminal-title { display: none; }
+  .orbital-svg-container { max-width: 260px; }
+  .orbital-svg        { height: 260px; }
+  .orbital-featured   { width: 112px; }
+  .of-avatar          { width: 36px; height: 36px; }
 }
 
 
