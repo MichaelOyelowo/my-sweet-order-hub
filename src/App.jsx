@@ -10,14 +10,12 @@ import OrderSection from './components/OrderSection'
 import Gallery from './components/Gallery.jsx'
 import GameTeaser from './components/GameTeaser.jsx'
 import WhySweetHub from './components/WhySweetHub'
+import Footer from './components/Footer'
 import GamesPage from './pages/GamesPage'
 import AdminPage from './pages/AdminPage'
 import './App.css'
 
-// ── Main site layout ──────────────────────────────────────────
-// IMPORTANT: This must live OUTSIDE the App function.
-// If defined inside, React treats it as a new component on every
-// render and causes an infinite re-render loop.
+
 function MainSite({ cartCount, addToCart, showCountdown, setShowCountdown }) {
   return (
     <>
@@ -35,6 +33,7 @@ function MainSite({ cartCount, addToCart, showCountdown, setShowCountdown }) {
       <Gallery/>
       <GameTeaser/>
       <WhySweetHub />
+      <Footer />
     </>
   )
 }

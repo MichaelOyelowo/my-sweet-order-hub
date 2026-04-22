@@ -8,7 +8,7 @@ function NavbarMobile({ cartCount }) {
   const [menuOpen, setMenuOpen]   = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
 
-  const links = [
+  const links =[
     { label: 'Home',    path: '/'         },
     { label: 'Shop',    path: '/#order'   },
     { label: 'Games',   path: '/games'    },
@@ -19,15 +19,17 @@ function NavbarMobile({ cartCount }) {
   const handleNav = (path) => {
     setMenuOpen(false)
     setSearchOpen(false)
+    
     if (path.startsWith('/#')) {
+      const hash = path.substring(1) // Extracts '#order'
+      
       if (location.pathname !== '/') {
-        navigate('/')
-        setTimeout(() => {
-          const el = document.getElementById(path.replace('/#', ''))
-          el?.scrollIntoView({ behavior: 'smooth' })
-        }, 100)
+        // If we are on /games, navigate back to home + hash
+        navigate('/' + hash)
       } else {
-        const el = document.getElementById(path.replace('/#', ''))
+        // If we are already home, update the URL hash natively so the active state moves
+        navigate(hash) 
+        const el = document.getElementById(hash.replace('#', ''))
         el?.scrollIntoView({ behavior: 'smooth' })
       }
     } else {
@@ -36,9 +38,15 @@ function NavbarMobile({ cartCount }) {
     }
   }
 
+  // Same smart active logic as the desktop Navbar
   const isActive = (path) => {
-    if (path === '/') return location.pathname === '/'
-    return location.pathname.startsWith(path.split('#')[0]) && path !== '/'
+    if (path === '/') {
+      return location.pathname === '/' && (location.hash === '' || location.hash === '#')
+    }
+    if (path.startsWith('/#')) {
+      return location.pathname === '/' && location.hash === path.substring(1)
+    }
+    return location.pathname.startsWith(path)
   }
 
   return (
@@ -131,17 +139,15 @@ function NavbarMobile({ cartCount }) {
               <a
                 href="#"
                 role="menuitem"
-                className={`
-                  ${isActive(path) ? 'active' : ''}
-                  ${label === 'Games' ? 'm-games-link' : ''}
-                `}
+                // The Games specific class is completely removed here!
+                className={isActive(path) ? 'active' : ''}
                 aria-current={isActive(path) ? 'page' : undefined}
                 onClick={(e) => {
                   e.preventDefault()
                   handleNav(path)
                 }}
               >
-                {label === 'Games'}
+                {/* The weird extra code rendering "false" or "true" is removed! */}
                 {label}
               </a>
             </li>

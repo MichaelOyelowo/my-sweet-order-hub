@@ -7,7 +7,7 @@ function Navbar({ cartCount }) {
   const location  = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const links = [
+  const links =[
     { label: 'Home',    path: '/'       },
     { label: 'Shop',    path: '/#order' },
     { label: 'Games',   path: '/games'  },
@@ -17,16 +17,17 @@ function Navbar({ cartCount }) {
 
   const handleNav = (path) => {
     setMenuOpen(false)
+    
     if (path.startsWith('/#')) {
-      // Scroll to section on homepage
+      const hash = path.substring(1) // Extracts '#order'
+      
       if (location.pathname !== '/') {
-        navigate('/')
-        setTimeout(() => {
-          const el = document.getElementById(path.replace('/#', ''))
-          el?.scrollIntoView({ behavior: 'smooth' })
-        }, 100)
+        // If we are on /games, navigate back to home + hash
+        navigate('/' + hash)
       } else {
-        const el = document.getElementById(path.replace('/#', ''))
+        // If we are already home, update the URL hash natively so the underline moves!
+        navigate(hash) 
+        const el = document.getElementById(hash.replace('#', ''))
         el?.scrollIntoView({ behavior: 'smooth' })
       }
     } else {
@@ -35,9 +36,18 @@ function Navbar({ cartCount }) {
     }
   }
 
+  // Smarter Active Logic
   const isActive = (path) => {
-    if (path === '/') return location.pathname === '/'
-    return location.pathname.startsWith(path.split('#')[0]) && path !== '/'
+    if (path === '/') {
+      // Home is ONLY active if we are on '/' AND there is no #hash (like #order)
+      return location.pathname === '/' && (location.hash === '' || location.hash === '#')
+    }
+    if (path.startsWith('/#')) {
+      // Shop, About, Contact are active if their hash matches the URL
+      return location.pathname === '/' && location.hash === path.substring(1)
+    }
+    // Games is active if we are on /games
+    return location.pathname.startsWith(path)
   }
 
   return (
@@ -60,16 +70,13 @@ function Navbar({ cartCount }) {
                 role="menuitem"
                 href="#"
                 aria-current={isActive(path) ? 'page' : undefined}
-                className={`
-                  ${isActive(path) ? 'active' : ''}
-                  ${label === 'Games' ? 'navbar-games-link' : ''}
-                `}
+                // Notice how we removed the navbar-games-link logic!
+                className={isActive(path) ? 'active' : ''}
                 onClick={(e) => {
                   e.preventDefault()
                   handleNav(path)
                 }}
               >
-                {label === 'Games'}
                 {label}
               </a>
             </li>

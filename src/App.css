@@ -4431,7 +4431,8 @@
    ══════════════════════════════ */
 
 .why-section {
-  background: #f5f0eb;
+  /* background: #f5f0eb; */
+  background: linear-gradient(to bottom, #f5f0eb 0%, #f5f0eb 22%, #f5f0eb 55%, #fffaf5 100%);
   background-image:
     radial-gradient(ellipse 80% 40% at 0% 50%, rgba(192,57,43,0.05) 0%, transparent 60%),
     radial-gradient(ellipse 60% 40% at 100% 50%, rgba(192,57,43,0.04) 0%, transparent 60%);
@@ -4683,6 +4684,7 @@
   font-style: italic;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -4705,56 +4707,77 @@
 }
 
 /* ══════════════════════════════
-   VIP CTA — inherits why-cta
+   BOTTOM CTA (FROSTED GLASS & NEON HOVER)
    ══════════════════════════════ */
 
-.orbital-cta {
-  width: 100%;
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  transition: box-shadow 0.4s ease, transform 0.3s ease !important;
-}
-
-/* ── Base why-cta styles (used by orbital-cta) ── */
 .why-cta {
   position: relative;
-  background: linear-gradient(135deg, #1a100c 0%, #0a0503 100%);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-radius: 20px;
   padding: 36px 24px;
   text-align: center;
   opacity: 0;
   transform: translateY(16px);
-  transition: opacity 0.6s ease 0.4s, transform 0.6s ease 0.4s, box-shadow 0.4s ease;
+  transition: opacity 0.6s ease 0.4s, transform 0.6s ease 0.4s;
   z-index: 1;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 8px 32px rgba(0, 0, 0, 0.04);
 }
 
 .why-cta.visible {
   opacity: 1;
   transform: translateY(0);
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.6s ease;
 }
 
 .why-cta.visible:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.3), 0 0 30px rgba(192,57,43,0.15);
+  transform: scale(1.02);
+  filter: hue-rotate(240deg) saturate(2);
 }
 
-/* Gradient border */
+/* 1. THE AMBIENT GLOW (Top-Left & Bottom-Right) */
 .why-cta::before {
-  content: '';
+  content: "";
+  position: absolute;
+  inset: -15px;
+  border-radius: 24px;
+  z-index: -1;
+  background: linear-gradient(
+    135deg, 
+    var(--accent) 0%, 
+    #e74c3c 15%,
+    transparent 35%, 
+    transparent 65%, 
+    #ffb84d 85%,
+    #f39c12 100%
+  );
+  filter: blur(25px);
+  opacity: 0.4;
+  transition: opacity 0.6s ease;
+}
+
+.why-cta.visible:hover::before {
+  opacity: 0.8; /* Glow gets brighter on hover */
+}
+
+/* 2. THE SHARP GRADIENT BORDER (Advanced CSS Masking) */
+.why-cta::after {
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 20px;
-  padding: 1.5px;
+  padding: 2px;
   background: linear-gradient(
-    135deg,
-    #ffb84d 0%,
-    var(--accent) 30%,
-    transparent 50%,
-    transparent 70%,
-    var(--accent) 90%,
-    #ffb84d 100%
+    135deg, 
+    var(--accent) 0%, 
+    #e74c3c 20%, 
+    transparent 45%, 
+    transparent 55%, 
+    #ffb84d 80%, 
+    #f39c12 100%
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -4763,28 +4786,12 @@
   pointer-events: none;
 }
 
-/* Shimmer sweep */
-.why-cta::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -150%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,184,77,0.08), transparent);
-  transform: skewX(-20deg);
-  transition: left 0.7s ease;
-  z-index: -1;
-  pointer-events: none;
-}
-
-.why-cta.visible:hover::after { left: 150%; }
-
+/* 3. TYPOGRAPHY (Dark text for the frosted glass) */
 .why-cta p:first-of-type {
   font-family: var(--font-heading);
-  font-size: 22px;
+  font-size: 22px; 
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text);
   margin-bottom: 8px;
   letter-spacing: -0.3px;
 }
@@ -4793,11 +4800,11 @@
   font-size: 14px !important;
   font-family: inherit !important;
   font-weight: 500 !important;
-  color: rgba(255,255,255,0.6) !important;
+  color: var(--text-muted) !important;
   margin-bottom: 24px !important;
 }
 
-/* CTA button */
+/* 4. THE BUTTON (Sleek light-sweep hover effect) */
 .why-cta-btn {
   position: relative;
   display: inline-flex;
@@ -4810,8 +4817,8 @@
   font-size: 15px;
   font-weight: 700;
   text-decoration: none;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.2s;
+  overflow: hidden; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   z-index: 1;
 }
 
@@ -4822,19 +4829,30 @@
   left: -150%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
   transform: skewX(-20deg);
   transition: left 0.5s ease;
-  z-index: 2;
+  z-index: 2; 
   pointer-events: none;
 }
 
-.why-cta-btn:hover::before { left: 150%; }
+.why-cta-btn:hover::before {
+  left: 150%;
+}
 
 .why-cta-btn:hover {
   background: var(--accent-h);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(192,57,43,0.4);
+  box-shadow: 0 8px 24px rgba(192, 57, 43, 0.4);
+}
+
+/* ── Specific override for the orbital section ── */
+.orbital-cta {
+  width: 100%;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  /* Allows the crazy hover effect to still work instantly here */
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.6s ease, box-shadow 0.4s ease !important;
 }
 
 /* ── Mobile ── */
@@ -4863,6 +4881,341 @@
   .of-avatar          { width: 36px; height: 36px; }
 }
 
+/* ══════════════════════════════
+   FOOTER (PREMIUM ESPRESSO THEME)
+   ══════════════════════════════ */
+.footer {
+  background: linear-gradient(180deg, #1a100c 0%, #0a0503 100%);
+  position: relative;
+  margin-top: 4rem;
+  overflow: hidden;
+}
+
+/* Subtle Gold Grid to match the Games theme */
+.footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 184, 77, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 184, 77, 0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* ── Wave divider ── */
+.footer-wave {
+  display: block;
+  line-height: 0;
+  margin-bottom: -2px;
+  background: var(--bg);
+  position: relative;
+  z-index: 1;
+}
+
+.footer-wave svg {
+  display: block;
+  width: 100%;
+  height: 80px;
+}
+
+/* Forces the wave to match the exact dark color of the footer top */
+.footer-wave svg path {
+  fill: #1a100c !important;
+}
+
+/* ── Main body ── */
+.footer-body {
+  padding: 64px 24px 48px;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+  gap: 48px;
+}
+
+/* ── Column base ── */
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Col 1 — Brand ── */
+.footer-brand { gap: 16px; }
+
+.footer-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  /* Keeps the logo white but softens it slightly */
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.footer-desc {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
+  max-width: 260px;
+}
+
+/* Social icons */
+.footer-socials {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.footer-social-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+/* Upgraded hover effect with a subtle red glow */
+.footer-social-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(192, 57, 43, 0.4);
+}
+
+/* Trust badge */
+.footer-trust {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.footer-trust-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #27ae60;
+  box-shadow: 0 0 6px rgba(39,174,96,0.7);
+  flex-shrink: 0;
+  animation: footerPulse 2s ease-in-out infinite;
+}
+
+@keyframes footerPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Col title ── */
+.footer-col-title {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 18px;
+  position: relative;
+  padding-bottom: 10px;
+  letter-spacing: 0.05em;
+}
+
+/* Changed the underline from red to the Warm Gold color */
+.footer-col-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 28px;
+  height: 2px;
+  background: #ffb84d; 
+  border-radius: 2px;
+}
+
+/* ── Link lists ── */
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.45);
+  text-decoration: none;
+  transition: color 0.2s, gap 0.2s;
+}
+
+.footer-link:hover {
+  color: white;
+  gap: 12px;
+}
+
+/* Changed arrows from red to gold to match the title underline */
+.footer-link-arrow {
+  font-size: 12px;
+  color: #ffb84d;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.footer-link:hover .footer-link-arrow {
+  transform: translateX(4px);
+}
+
+/* ── Contact items ── */
+.footer-contact-items {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer-contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.footer-contact-item:not(.no-link):hover {
+  transform: translateX(4px);
+}
+
+.fci-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fci-wa       { background: rgba(37,211,102,0.12);  color: #25d366; }
+.fci-email    { background: rgba(192,57,43,0.12);   color: var(--accent); }
+.fci-location { background: rgba(255,184,77,0.12);  color: #ffb84d; }
+.fci-hours    { background: rgba(41,128,185,0.12);  color: #3498db; }
+
+.fci-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fci-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.3);
+}
+
+.fci-value {
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.footer-contact-item:not(.no-link):hover .fci-value {
+  color: white;
+}
+
+/* ── Bottom bar ── */
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 20px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-bottom-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+}
+
+.footer-bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-bottom-links a {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-bottom-links a:hover { color: #ffb84d; }
+
+.fbl-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+
+.footer-made {
+  font-size: 12px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Mobile ── */
+@media (max-width: 968px) {
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-desc  { max-width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .footer-body  { padding: 48px 20px 36px; }
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .footer-bottom-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  .footer-made { display: none; }
+  .footer-wave svg { height: 50px; }
+}
 
 
 /* ==========================================================================
