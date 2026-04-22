@@ -5,7 +5,7 @@ const QUICK_LINKS =[
   { label: 'Shop',         href: '#order'        },
   { label: 'Games',      href: '/games'       },
   { label: 'Custom Order', href: '#custom-order' },
-  { label: 'About Us',     href: '#'            },
+  { label: 'About Us',     href: '/about'            },
   { label: 'Contact',      href: '/contact'            },
 ]
 
@@ -241,7 +241,7 @@ export default function Footer() {
           </p>
 
           <div className="footer-bottom-links">
-            <a href="./privacy">Privacy Policy</a>
+            <a href="./privacy">Privacy Policy</a>``
             <span className="fbl-dot" />
             <a href="./terms">Terms of Service</a>
             <span className="fbl-dot" />

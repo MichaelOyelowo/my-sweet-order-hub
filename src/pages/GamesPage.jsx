@@ -266,34 +266,68 @@ function MemoryMatch({ onWin }) {
   )
 }
 
-// ── CATCH THE SNACKS ──────────────────────────────────────────
-const BASKET_W   = 80
-const GAME_W     = 320
-const ITEM_SIZE  = 36
-const FALL_SPEED = 3
-const SPAWN_RATE = 1400
-const WIN_SCORE  = 15
-const MAX_MISS   = 5
+// ════════════════════════════════════════════════════════════
+// CATCH THE SNACKS — Updated with PS controller UI
+// ════════════════════════════════════════════════════════════
+
+const BASKET_W    = 72
+const GAME_W      = 320
+const ITEM_SIZE   = 36
+const FALL_SPEED  = 5.5      // faster than before (was 3)
+const SPAWN_RATE  = 1000     // faster spawns (was 1400)
+const WIN_SCORE   = 15
+const MAX_MISS    = 5
+const BASKET_STEP = 18       // pixels per controller press
 
 function CatchSnacks({ onWin }) {
-  const [basketX, setBasketX]   = useState(GAME_W / 2 - BASKET_W / 2)
-  const [items, setItems]       = useState([])
-  const [score, setScore]       = useState(0)
-  const [missed, setMissed]     = useState(0)
-  const [timeLeft, setTimeLeft] = useState(60)
-  const gameRef   = useRef(null)
-  const basketRef = useRef(basketX)
-  const itemsRef  = useRef([])
-  const rafRef    = useRef(null)
-  const spawnRef  = useRef(null)
-  const timerRef  = useRef(null)
-  const scoreRef  = useRef(0)
-  const missRef   = useRef(0)
-  const nextId    = useRef(0)
+  const [basketX, setBasketX]     = useState(GAME_W / 2 - BASKET_W / 2)
+  const [items, setItems]         = useState([])
+  const [score, setScore]         = useState(0)
+  const [missed, setMissed]       = useState(0)
+  const [timeLeft, setTimeLeft]   = useState(60)
+  const [combo, setCombo]         = useState(0)
+  const [comboMsg, setComboMsg]   = useState(null) // { text, id }
+  const [catchFlash, setCatchFlash] = useState(false)
+
+  const gameRef    = useRef(null)
+  const basketRef  = useRef(basketX)
+  const itemsRef   = useRef([])
+  const rafRef     = useRef(null)
+  const spawnRef   = useRef(null)
+  const timerRef   = useRef(null)
+  const scoreRef   = useRef(0)
+  const missRef    = useRef(0)
+  const comboRef   = useRef(0)
+  const nextId     = useRef(0)
+  const keysRef    = useRef({})
+  const btnRef     = useRef({ left: false, right: false })
+  const gameActive = useRef(true)
 
   basketRef.current = basketX
 
-  const handleMove = useCallback((clientX) => {
+  // ── Haptic vibration ─────────────────────────────────────
+  const vibrate = (pattern) => {
+    if (navigator.vibrate) navigator.vibrate(pattern)
+  }
+
+  // ── Combo message helper ──────────────────────────────────
+  const showCombo = (streak) => {
+    const msgs = {
+      3:  '🔥 Combo x3!',
+      5:  '⚡ Combo x5!',
+      7:  '💥 INSANE x7!',
+      10: '🏆 GODLIKE x10!',
+    }
+    const text = msgs[streak]
+    if (text) {
+      const id = Date.now()
+      setComboMsg({ text, id })
+      setTimeout(() => setComboMsg(null), 1200)
+    }
+  }
+
+  // ── Mouse / touch move ────────────────────────────────────
+  const handlePointerMove = useCallback((clientX) => {
     const rect = gameRef.current?.getBoundingClientRect()
     if (!rect) return
     const rel = clientX - rect.left - BASKET_W / 2
@@ -301,54 +335,114 @@ function CatchSnacks({ onWin }) {
   }, [])
 
   useEffect(() => {
-    const onMouse = (e) => handleMove(e.clientX)
-    const onTouch = (e) => handleMove(e.touches[0].clientX)
+    const onMouse = (e) => handlePointerMove(e.clientX)
+    const onTouch = (e) => {
+      // Only track touches inside the game arena
+      const rect = gameRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const t = e.touches[0]
+      if (t.clientY >= rect.top && t.clientY <= rect.bottom) {
+        handlePointerMove(t.clientX)
+      }
+    }
     window.addEventListener('mousemove', onMouse)
     window.addEventListener('touchmove', onTouch, { passive: true })
-    return () => { window.removeEventListener('mousemove', onMouse); window.removeEventListener('touchmove', onTouch) }
-  }, [handleMove])
+    return () => {
+      window.removeEventListener('mousemove', onMouse)
+      window.removeEventListener('touchmove', onTouch)
+    }
+  }, [handlePointerMove])
 
+  // ── Keyboard controls ─────────────────────────────────────
   useEffect(() => {
-    const keys = {}
-    const onDown = (e) => { keys[e.key] = true }
-    const onUp   = (e) => { keys[e.key] = false }
-    const move   = setInterval(() => {
-      if (keys['ArrowLeft']  || keys['a']) setBasketX(p => Math.max(0, p - 14))
-      if (keys['ArrowRight'] || keys['d']) setBasketX(p => Math.min(GAME_W - BASKET_W, p + 14))
-    }, 16)
+    const onDown = (e) => { keysRef.current[e.key] = true }
+    const onUp   = (e) => { keysRef.current[e.key] = false }
     window.addEventListener('keydown', onDown)
     window.addEventListener('keyup', onUp)
-    return () => { clearInterval(move); window.removeEventListener('keydown', onDown); window.removeEventListener('keyup', onUp) }
+    return () => {
+      window.removeEventListener('keydown', onDown)
+      window.removeEventListener('keyup', onUp)
+    }
   }, [])
 
+  // ── Controller button press handlers ─────────────────────
+  const pressLeft  = () => { btnRef.current.left  = true }
+  const releaseLeft  = () => { btnRef.current.left  = false }
+  const pressRight = () => { btnRef.current.right = true }
+  const releaseRight = () => { btnRef.current.right = false }
+
+  // ── Basket movement loop (keyboard + controller) ──────────
+  useEffect(() => {
+    const moveLoop = setInterval(() => {
+      const left  = keysRef.current['ArrowLeft']  || keysRef.current['a'] || btnRef.current.left
+      const right = keysRef.current['ArrowRight'] || keysRef.current['d'] || btnRef.current.right
+      if (left)  setBasketX(p => Math.max(0, p - BASKET_STEP))
+      if (right) setBasketX(p => Math.min(GAME_W - BASKET_W, p + BASKET_STEP))
+    }, 16)
+    return () => clearInterval(moveLoop)
+  }, [])
+
+  // ── Spawn items ───────────────────────────────────────────
   useEffect(() => {
     spawnRef.current = setInterval(() => {
+      if (!gameActive.current) return
       const food = randItem(FOODS)
       const x    = Math.random() * (GAME_W - ITEM_SIZE)
-      itemsRef.current = [...itemsRef.current, { id: nextId.current++, x, y: -ITEM_SIZE, food }]
+      itemsRef.current = [...itemsRef.current, {
+        id: nextId.current++, x, y: -ITEM_SIZE, food,
+        speedMult: 0.85 + Math.random() * 0.5, // slight speed variation per item
+      }]
     }, SPAWN_RATE)
     return () => clearInterval(spawnRef.current)
   }, [])
 
+  // ── Game loop ─────────────────────────────────────────────
   useEffect(() => {
     const loop = () => {
+      const bx = basketRef.current
       itemsRef.current = itemsRef.current
-        .map(item => ({ ...item, y: item.y + FALL_SPEED }))
+        .map(item => ({ ...item, y: item.y + FALL_SPEED * item.speedMult }))
         .filter(item => {
-          const bx = basketRef.current
-          if (item.y + ITEM_SIZE >= 260 && item.y <= 290 && item.x + ITEM_SIZE >= bx && item.x <= bx + BASKET_W) {
-            scoreRef.current += 1; setScore(scoreRef.current)
+          // Caught
+          if (
+            item.y + ITEM_SIZE >= 260 &&
+            item.y <= 295 &&
+            item.x + ITEM_SIZE >= bx &&
+            item.x <= bx + BASKET_W
+          ) {
+            scoreRef.current += 1
+            comboRef.current += 1
+            setScore(scoreRef.current)
+            setCombo(comboRef.current)
+            showCombo(comboRef.current)
+            setCatchFlash(true)
+            setTimeout(() => setCatchFlash(false), 120)
+            vibrate(30) // short buzz on catch
+
             if (scoreRef.current >= WIN_SCORE) {
-              cancelAnimationFrame(rafRef.current); clearInterval(spawnRef.current); clearInterval(timerRef.current)
-              onWin(true); return false
+              gameActive.current = false
+              cancelAnimationFrame(rafRef.current)
+              clearInterval(spawnRef.current)
+              clearInterval(timerRef.current)
+              vibrate([50, 30, 50, 30, 100]) // win pattern
+              setTimeout(() => onWin(true), 300)
             }
             return false
           }
-          if (item.y > 300) {
-            missRef.current += 1; setMissed(missRef.current)
+          // Missed
+          if (item.y > 305) {
+            missRef.current += 1
+            comboRef.current = 0
+            setMissed(missRef.current)
+            setCombo(0)
+            vibrate([80, 40, 80]) // miss buzz
+
             if (missRef.current >= MAX_MISS) {
-              cancelAnimationFrame(rafRef.current); clearInterval(spawnRef.current); clearInterval(timerRef.current)
-              onWin(false); return false
+              gameActive.current = false
+              cancelAnimationFrame(rafRef.current)
+              clearInterval(spawnRef.current)
+              clearInterval(timerRef.current)
+              setTimeout(() => onWin(false), 300)
             }
             return false
           }
@@ -361,10 +455,18 @@ function CatchSnacks({ onWin }) {
     return () => cancelAnimationFrame(rafRef.current)
   }, [])
 
+  // ── Timer ─────────────────────────────────────────────────
   useEffect(() => {
     timerRef.current = setInterval(() => {
       setTimeLeft(p => {
-        if (p <= 1) { clearInterval(timerRef.current); cancelAnimationFrame(rafRef.current); clearInterval(spawnRef.current); onWin(false); return 0 }
+        if (p <= 1) {
+          gameActive.current = false
+          clearInterval(timerRef.current)
+          cancelAnimationFrame(rafRef.current)
+          clearInterval(spawnRef.current)
+          onWin(scoreRef.current >= WIN_SCORE)
+          return 0
+        }
         return p - 1
       })
     }, 1000)
@@ -375,9 +477,14 @@ function CatchSnacks({ onWin }) {
   const pctTime = (timeLeft / 60) * 100
 
   return (
-    <div className="game-wrap">
+    <div className="game-wrap catch-wrap">
+
+      {/* ── Stats bar ── */}
       <div className="game-topbar">
-        <div className="game-stat"><span className="gs-label">Caught</span><span className="gs-val">{score}/{WIN_SCORE}</span></div>
+        <div className="game-stat">
+          <span className="gs-label">Caught</span>
+          <span className="gs-val">{score}/{WIN_SCORE}</span>
+        </div>
         <div className="game-timer-ring-wrap">
           <svg viewBox="0 0 44 44" className="game-timer-svg">
             <circle cx="22" cy="22" r="18" fill="none" stroke="#f0e6dc" strokeWidth="3"/>
@@ -390,26 +497,112 @@ function CatchSnacks({ onWin }) {
           </svg>
           <span className="game-timer-txt" style={{ color: tColor }}>{timeLeft}s</span>
         </div>
-        <div className="game-stat"><span className="gs-label">Missed</span><span className="gs-val" style={{ color: missRef.current > 0 ? '#c0392b' : 'inherit' }}>{missed}/{MAX_MISS}</span></div>
+        <div className="game-stat">
+          <span className="gs-label">Missed</span>
+          <span className="gs-val" style={{ color: missRef.current > 0 ? '#c0392b' : 'inherit' }}>
+            {missed}/{MAX_MISS}
+          </span>
+        </div>
       </div>
+
+      {/* Combo badge */}
+      {combo >= 3 && (
+        <div className="catch-combo-badge">
+          🔥 {combo} combo
+        </div>
+      )}
+
+      {/* Score bar */}
       <div className="catch-score-bar-wrap">
-        <div className="catch-score-bar-fill" style={{ width: `${(score / WIN_SCORE) * 100}%` }} />
+        <div
+          className="catch-score-bar-fill"
+          style={{ width: `${(score / WIN_SCORE) * 100}%` }}
+        />
         <span className="catch-score-bar-label">{score} / {WIN_SCORE} snacks caught</span>
       </div>
-      <div className="catch-arena" ref={gameRef} style={{ width: GAME_W, height: 300 }}>
+
+      {/* ── Game arena ── */}
+      <div
+        className={`catch-arena ${catchFlash ? 'catch-flash' : ''}`}
+        ref={gameRef}
+        style={{ width: GAME_W, height: 300 }}
+      >
+        {/* Falling items */}
         {items.map(item => (
-          <div key={item.id} className="catch-item" style={{ left: item.x, top: item.y, width: ITEM_SIZE, height: ITEM_SIZE }} aria-hidden="true">
+          <div
+            key={item.id}
+            className="catch-item"
+            style={{ left: item.x, top: item.y, width: ITEM_SIZE, height: ITEM_SIZE }}
+            aria-hidden="true"
+          >
             <span>{item.food.emoji}</span>
           </div>
         ))}
-        <div className="catch-basket" style={{ left: basketX, width: BASKET_W }} aria-label="Basket">🧺</div>
+
+        {/* Basket */}
+        <div
+          className="catch-basket"
+          style={{ left: basketX, width: BASKET_W }}
+          aria-label="Basket"
+        >
+          🧺
+        </div>
+
+        {/* Miss dots */}
         <div className="catch-misses">
           {Array.from({ length: MAX_MISS }).map((_, i) => (
             <span key={i} className={`catch-miss-dot ${i < missed ? 'lost' : ''}`} />
           ))}
         </div>
+
+        {/* Floating combo message */}
+        {comboMsg && (
+          <div key={comboMsg.id} className="catch-combo-pop" aria-live="polite">
+            {comboMsg.text}
+          </div>
+        )}
       </div>
-      <p className="game-hint">Move mouse or use ← → arrow keys to catch snacks!</p>
+
+      {/* ── PS-style controller ── */}
+      <div className="catch-controller" aria-label="Game controller">
+
+        {/* Left button */}
+        <button
+          className="ctrl-btn ctrl-left"
+          onPointerDown={pressLeft}
+          onPointerUp={releaseLeft}
+          onPointerLeave={releaseLeft}
+          aria-label="Move left"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="currentColor">
+            <path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/>
+          </svg>
+        </button>
+
+        {/* Centre display */}
+        <div className="ctrl-centre">
+          <div className="ctrl-centre-inner">
+            <span className="ctrl-score">{score}</span>
+            <span className="ctrl-score-label">caught</span>
+          </div>
+        </div>
+
+        {/* Right button */}
+        <button
+          className="ctrl-btn ctrl-right"
+          onPointerDown={pressRight}
+          onPointerUp={releaseRight}
+          onPointerLeave={releaseRight}
+          aria-label="Move right"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="currentColor">
+            <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/>
+          </svg>
+        </button>
+
+      </div>
+
+      <p className="game-hint">Tap ← → buttons · Move mouse · Arrow keys</p>
     </div>
   )
 }

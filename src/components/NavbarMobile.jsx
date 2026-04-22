@@ -8,12 +8,13 @@ function NavbarMobile({ cartCount }) {
   const [menuOpen, setMenuOpen]   = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
 
-  const links =[
+  const links = [
     { label: 'Home',    path: '/'         },
     { label: 'Shop',    path: '/#order'   },
     { label: 'Games',   path: '/games'    },
-    { label: 'About',   path: '/#about'   },
+    { label: 'About',   path: '/about'   },
     { label: 'Contact', path: '/contact' },
+    { label: 'Track Order', path: '/track-order' },
   ]
 
   const handleNav = (path) => {

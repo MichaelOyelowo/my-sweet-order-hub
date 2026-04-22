@@ -7,12 +7,13 @@ function Navbar({ cartCount }) {
   const location  = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const links =[
+  const links = [
     { label: 'Home',    path: '/'       },
     { label: 'Shop',    path: '/#order' },
     { label: 'Games',   path: '/games'  },
-    { label: 'About',   path: '/#about' },
+    { label: 'About',   path: '/about' },
     { label: 'Contact', path: '/contact' },
+    { label: 'Track Order', path: '/track-order' },
   ]
 
   const handleNav = (path) => {
@@ -70,7 +71,6 @@ function Navbar({ cartCount }) {
                 role="menuitem"
                 href="#"
                 aria-current={isActive(path) ? 'page' : undefined}
-                // Notice how we removed the navbar-games-link logic!
                 className={isActive(path) ? 'active' : ''}
                 onClick={(e) => {
                   e.preventDefault()
