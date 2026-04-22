@@ -79,8 +79,6 @@ function App() {
       if (document.visibilityState === 'visible') {
         const ordered = sessionStorage.getItem('sweethub_ordered')
         if (ordered === 'true') {
-          sessionStorage.removeItem('sweethub_ordered')
-          setTimeout(() => setShowCountdown(true), 600)
         }
       }
     }

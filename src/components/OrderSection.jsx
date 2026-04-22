@@ -57,89 +57,89 @@ const saveCart = (items) => {
 
 
 // ── Countdown Timer ───────────────────────────────────────────
-function CountdownTimer({ onClose, orderRef }) {
-  const TOTAL = 90 * 60
-  const [seconds, setSeconds] = useState(TOTAL)
-  const [phase, setPhase]     = useState('preparing')
-  const intervalRef           = useRef(null)
+// function CountdownTimer({ onClose, orderRef }) {
+//   const TOTAL = 90 * 60
+//   const [seconds, setSeconds] = useState(TOTAL)
+//   const [phase, setPhase]     = useState('preparing')
+//   const intervalRef           = useRef(null)
 
-  useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      setSeconds(prev => {
-        const next = prev - 1
-        if (next <= 0) { clearInterval(intervalRef.current); setPhase('ready'); return 0 }
-        if (next === 60 * 60) setPhase('ready_soon')
-        return next
-      })
-    }, 1000)
-    return () => clearInterval(intervalRef.current)
-  }, [])
+//   useEffect(() => {
+//     intervalRef.current = setInterval(() => {
+//       setSeconds(prev => {
+//         const next = prev - 1
+//         if (next <= 0) { clearInterval(intervalRef.current); setPhase('ready'); return 0 }
+//         if (next === 60 * 60) setPhase('ready_soon')
+//         return next
+//       })
+//     }, 1000)
+//     return () => clearInterval(intervalRef.current)
+//   }, [])
 
-  const mins     = Math.floor(seconds / 60)
-  const secs     = seconds % 60
-  const progress = ((TOTAL - seconds) / TOTAL) * 100
+//   const mins     = Math.floor(seconds / 60)
+//   const secs     = seconds % 60
+//   const progress = ((TOTAL - seconds) / TOTAL) * 100
 
-  const phases = {
-    preparing:  { emoji: '👨‍🍳', title: "We're preparing your order!", msg: 'Our team has received your order and is getting started. Fresh and made with love ❤️', color: '#c0392b' },
-    ready_soon: { emoji: '🎉', title: 'Almost ready!',                  msg: 'Your order will be ready in about 30 minutes. Get excited! 🛵',                        color: '#e67e22' },
-    ready:      { emoji: '✅', title: 'Your order is ready!',           msg: 'Your SweetHUB order is on its way to you right now. Enjoy! 🎊',                        color: '#27ae60' },
-  }
-  const cur = phases[phase]
+//   const phases = {
+//     preparing:  { emoji: '👨‍🍳', title: "We're preparing your order!", msg: 'Our team has received your order and is getting started. Fresh and made with love ❤️', color: '#c0392b' },
+//     ready_soon: { emoji: '🎉', title: 'Almost ready!',                  msg: 'Your order will be ready in about 30 minutes. Get excited! 🛵',                        color: '#e67e22' },
+//     ready:      { emoji: '✅', title: 'Your order is ready!',           msg: 'Your SweetHUB order is on its way to you right now. Enjoy! 🎊',                        color: '#27ae60' },
+//   }
+//   const cur = phases[phase]
 
-  return (
-    <div className="countdown-overlay">
-      <div className="countdown-card">
-        <button className="countdown-close" onClick={onClose} aria-label="Close">
-          <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
-            <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
-          </svg>
-        </button>
+//   return (
+//     <div className="countdown-overlay">
+//       <div className="countdown-card">
+//         <button className="countdown-close" onClick={onClose} aria-label="Close">
+//           <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
+//             <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+//           </svg>
+//         </button>
 
-        {orderRef && (
-          <div className="countdown-order-ref">Order {orderRef}</div>
-        )}
+//         {orderRef && (
+//           <div className="countdown-order-ref">Order {orderRef}</div>
+//         )}
 
-        <div className="countdown-emoji">{cur.emoji}</div>
-        <h3 className="countdown-title">{cur.title}</h3>
-        <p className="countdown-msg">{cur.msg}</p>
+//         <div className="countdown-emoji">{cur.emoji}</div>
+//         <h3 className="countdown-title">{cur.title}</h3>
+//         <p className="countdown-msg">{cur.msg}</p>
 
-        {phase !== 'ready' && (
-          <>
-            <div className="countdown-timer">
-              <span className="countdown-digits">
-                {String(mins).padStart(2, '0')}
-                <span className="countdown-colon">:</span>
-                {String(secs).padStart(2, '0')}
-              </span>
-              <span className="countdown-label">estimated time remaining</span>
-            </div>
-            <div className="countdown-bar-wrap">
-              <div className="countdown-bar-fill" style={{ width: `${progress}%`, background: cur.color }} />
-            </div>
-          </>
-        )}
+//         {phase !== 'ready' && (
+//           <>
+//             <div className="countdown-timer">
+//               <span className="countdown-digits">
+//                 {String(mins).padStart(2, '0')}
+//                 <span className="countdown-colon">:</span>
+//                 {String(secs).padStart(2, '0')}
+//               </span>
+//               <span className="countdown-label">estimated time remaining</span>
+//             </div>
+//             <div className="countdown-bar-wrap">
+//               <div className="countdown-bar-fill" style={{ width: `${progress}%`, background: cur.color }} />
+//             </div>
+//           </>
+//         )}
 
-        <div className="countdown-steps">
-          <div className={`countdown-step ${['preparing','ready_soon','ready'].includes(phase) ? 'done' : ''}`}>
-            <div className="cs-dot" /><span>Order received</span>
-          </div>
-          <div className="countdown-step-line" />
-          <div className={`countdown-step ${['ready_soon','ready'].includes(phase) ? 'done' : ''}`}>
-            <div className="cs-dot" /><span>Being prepared</span>
-          </div>
-          <div className="countdown-step-line" />
-          <div className={`countdown-step ${phase === 'ready' ? 'done' : ''}`}>
-            <div className="cs-dot" /><span>Out for delivery</span>
-          </div>
-        </div>
+//         <div className="countdown-steps">
+//           <div className={`countdown-step ${['preparing','ready_soon','ready'].includes(phase) ? 'done' : ''}`}>
+//             <div className="cs-dot" /><span>Order received</span>
+//           </div>
+//           <div className="countdown-step-line" />
+//           <div className={`countdown-step ${['ready_soon','ready'].includes(phase) ? 'done' : ''}`}>
+//             <div className="cs-dot" /><span>Being prepared</span>
+//           </div>
+//           <div className="countdown-step-line" />
+//           <div className={`countdown-step ${phase === 'ready' ? 'done' : ''}`}>
+//             <div className="cs-dot" /><span>Out for delivery</span>
+//           </div>
+//         </div>
 
-        {phase === 'ready' && (
-          <button className="countdown-done-btn" onClick={onClose}>Close & Continue Shopping</button>
-        )}
-      </div>
-    </div>
-  )
-}
+//         {phase === 'ready' && (
+//           <button className="countdown-done-btn" onClick={onClose}>Close & Continue Shopping</button>
+//         )}
+//       </div>
+//     </div>
+//   )
+// }
 
 
 // ── Upsell Toast ──────────────────────────────────────────────
