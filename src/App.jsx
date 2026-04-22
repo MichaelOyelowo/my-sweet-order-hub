@@ -11,6 +11,10 @@ import Gallery from './components/Gallery.jsx'
 import GameTeaser from './components/GameTeaser.jsx'
 import WhySweetHub from './components/WhySweetHub'
 import Footer from './components/Footer'
+import ReturnPage from './pages/ReturnPage'
+import PrivacyPage from './pages/PrivacyPage'
+import TermsPage from './pages/TermsPage'
+import ContactPage from './pages/ContactPage'
 import GamesPage from './pages/GamesPage'
 import AdminPage from './pages/AdminPage'
 import './App.css'
@@ -86,6 +90,10 @@ function App() {
             />
           }
         />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/return" element={<ReturnPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/games" element={<GamesLayout cartCount={cartCount} />} />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>

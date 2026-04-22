@@ -1,10 +1,4 @@
-// src/pages/GamesPage.jsx
 // This is the full /games page.
-// It takes your existing PuzzleGame component (the popup)
-// and renders it as a proper full page instead of a popup overlay.
-// Move your PuzzleGame.jsx to src/components/PuzzleGame.jsx
-// and import it here.
-
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 // ── Config ────────────────────────────────────────────────────
@@ -43,12 +37,6 @@ const GAME_CONFIGS = [
   { id: 'catch',  name: 'Catch the Snacks', emoji: '🍿', tagline: 'Catch 15 snacks in your basket', time: '60 seconds', tip: 'Move mouse or arrow keys',       color: '#e67e22' },
 ]
 
-// ─────────────────────────────────────────────────────────────
-// Copy all your game sub-components here:
-// SlidingPuzzle, MemoryMatch, CatchSnacks, RewardScreen
-// from your existing PuzzleGame.jsx — they are identical.
-// (Paste them below this comment)
-// ─────────────────────────────────────────────────────────────
 
 // ── SLIDING PUZZLE ────────────────────────────────────────────
 const GRID  = 4

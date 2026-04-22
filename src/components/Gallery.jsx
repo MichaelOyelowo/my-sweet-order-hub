@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 
 import banana_bread1 from '../assets/banana-breads/banana-bread5.webp'
 import banana_bread2 from '../assets/banana-breads/banana-bread6.webp'
+import banana_bread3 from '../assets/banana-breads/banana-bread7.webp'
 
 import cake1  from '../assets/cakes/birthday-layer-cake.webp'
 import cake2  from '../assets/cakes/cake-red-velvet.webp'
@@ -48,21 +49,23 @@ const GALLERY_ITEMS = [
   { id: 11, category: 'Cakes',  label: 'Choco Cupcakes',         tag: 'New Taste',   img: cake8,        height: 'medium' },
   { id: 12, category: 'Snacks', label: 'Frank Roll',             tag: 'Hot 🔥',        img: frank_roll,   height: 'short'  },
   // Load more
-  { id: 13, category: 'Cakes',  label: 'Wedding Cake',           tag: 'Custom Order',  img: cake12,       height: 'tall'   },
+  { id: 13, category: 'Snacks', label: 'Banana Bread Loaf',      tag: 'Healthy Pick',  img: banana_bread3,height: 'medium'  },
   { id: 14, category: 'Snacks', label: 'Crispy Doughnut',        tag: 'Fan Favourite', img: dough2,       height: 'medium' },
   { id: 15, category: 'Snacks', label: 'Fresh Buns',             tag: 'Hot 🔥',        img: buns,         height: 'short'  },
   { id: 16, category: 'Cakes',  label: 'Orange Cupcake',         tag: 'New Taste',   img: cake9,        height: 'short'  },
   { id: 17, category: 'Cakes',  label: 'Chocolate Layer Cake',   tag: 'Yummy',   img: cake6,        height: 'tall'   },
   { id: 18, category: 'Snacks', label: 'Samosa Bites',           tag: 'Crispy 🔥',     img: samosa1,      height: 'short'  },
-  { id: 19, category: 'Cakes',  label: 'Red Velvet Slice',       tag: 'Fan Favourite', img: cake11,       height: 'medium' },
-  { id: 20, category: 'Snacks', label: 'Puff Puff Fresh',        tag: 'Hot 🔥',        img: puff1,        height: 'short'  },
-  { id: 21, category: 'Cakes',  label: 'Wedding Cake Classic',   tag: 'Custom Order',  img: cake13,       height: 'tall'   },
-  { id: 22, category: 'Pies',   label: 'Frank Roll Fresh',       tag: 'Yummy',   img: frank_roll1,  height: 'medium' },
-  { id: 23, category: 'Cakes',  label: 'Vanilla Cupcake',        tag: 'New Taste',   img: cake10,       height: 'short'  },
-  { id: 24, category: 'Cakes',  label: 'Dark Chocolate Cake',    tag: 'Fan Favourite', img: cake7,        height: 'tall'   },
-  { id: 25, category: 'Cakes',  label: 'Tiered Wedding Cake',    tag: 'Custom Order',  img: cake14,       height: 'medium' },
-  { id: 26, category: 'Snacks', label: 'Banana Bread Loaf',      tag: 'Healthy Pick',  img: banana_bread2,height: 'short'  },
-  { id: 27, category: 'Cakes',  label: 'Rich Choco Bite',        tag: 'Yummy',   img: cake3,        height: 'medium' },
+  { id: 19, category: 'Cakes',  label: 'Wedding Cake',           tag: 'Custom Order',  img: cake12,       height: 'tall'   },
+  { id: 20, category: 'Cakes',  label: 'Red Velvet Slice',       tag: 'Fan Favourite', img: cake11,       height: 'medium' },
+  { id: 21, category: 'Snacks', label: 'Puff Puff Fresh',        tag: 'Hot 🔥',        img: puff1,        height: 'short'  },
+  { id: 22, category: 'Cakes',  label: 'Wedding Cake Classic',   tag: 'Custom Order',  img: cake13,       height: 'tall'   },
+  { id: 23, category: 'Pies',   label: 'Frank Roll Fresh',       tag: 'Yummy',   img: frank_roll1,  height: 'medium' },
+  { id: 24, category: 'Cakes',  label: 'Vanilla Cupcake',        tag: 'New Taste',   img: cake10,       height: 'short'  },
+  { id: 25, category: 'Cakes',  label: 'Dark Chocolate Cake',    tag: 'Fan Favourite', img: cake7,        height: 'tall'   },
+  { id: 26, category: 'Cakes',  label: 'Tiered Wedding Cake',    tag: 'Custom Order',  img: cake14,       height: 'medium' },
+  { id: 27, category: 'Snacks', label: 'Banana Bread Loaf',      tag: 'Healthy Pick',  img: banana_bread2,height: 'short'  },
+  { id: 28, category: 'Cakes',  label: 'Rich Choco Bite',        tag: 'Yummy',   img: cake3,        height: 'medium' },
+
 ]
 
 const CATEGORIES    = ['All', 'Snacks', 'Cakes', 'Pies']

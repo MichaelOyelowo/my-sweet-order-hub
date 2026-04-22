@@ -6,7 +6,7 @@ const QUICK_LINKS =[
   { label: 'Games',      href: '/games'       },
   { label: 'Custom Order', href: '#custom-order' },
   { label: 'About Us',     href: '#'            },
-  { label: 'Contact',      href: '#'            },
+  { label: 'Contact',      href: '/contact'            },
 ]
 
 const CATEGORIES =[
@@ -222,7 +222,7 @@ export default function Footer() {
                 </div>
                 <div className="fci-text">
                   <span className="fci-label">Hours</span>
-                  <span className="fci-value">Mon–Sat · 8am – 9pm</span>
+                  <span className="fci-value">Mon - Sat · 8am - 9pm</span>
                 </div>
               </div>
 
@@ -241,11 +241,11 @@ export default function Footer() {
           </p>
 
           <div className="footer-bottom-links">
-            <a href="#">Privacy Policy</a>
+            <a href="./privacy">Privacy Policy</a>
             <span className="fbl-dot" />
-            <a href="#">Terms of Service</a>
+            <a href="./terms">Terms of Service</a>
             <span className="fbl-dot" />
-            <a href="#">Refund Policy</a>
+            <a href="./return">Refund Policy</a>
           </div>
 
           <p className="footer-made">

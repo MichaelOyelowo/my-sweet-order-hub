@@ -12,7 +12,7 @@ function Navbar({ cartCount }) {
     { label: 'Shop',    path: '/#order' },
     { label: 'Games',   path: '/games'  },
     { label: 'About',   path: '/#about' },
-    { label: 'Contact', path: '/#contact' },
+    { label: 'Contact', path: '/contact' },
   ]
 
   const handleNav = (path) => {
