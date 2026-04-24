@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-const ADMIN_PASSWORD = 'sweethub2024'  // ← change this to your own password
-const fmt = (n) => '₦' + n.toLocaleString()
+const ADMIN_PASSWORD = 'sweethub2024'
+const fmt = (n) => '₦' + Number(n || 0).toLocaleString()
 
 const STATUS_COLORS = {
   'Pending':    { bg: '#fff3cd', color: '#856404', dot: '#f0ad4e' },
@@ -12,7 +12,6 @@ const STATUS_COLORS = {
   'Delivered':  { bg: '#e2e3e5', color: '#383d41', dot: '#888'    },
   'Cancelled':  { bg: '#f8d7da', color: '#721c24', dot: '#e74c3c' },
 }
-
 const STATUSES = Object.keys(STATUS_COLORS)
 
 function StatusBadge({ status }) {
@@ -25,18 +24,50 @@ function StatusBadge({ status }) {
   )
 }
 
+/* -------- Tiny confirm dialog -------- */
+function ConfirmDialog({ open, title, message, confirmLabel, danger, onConfirm, onCancel }) {
+  if (!open) return null
+  return (
+    <div className="admin-modal-overlay" onClick={onCancel}>
+      <div className="admin-confirm" onClick={e => e.stopPropagation()}>
+        <h3>{title}</h3>
+        <p>{message}</p>
+        <div className="admin-confirm-actions">
+          <button className="admin-btn-ghost" onClick={onCancel}>Cancel</button>
+          <button
+            className={danger ? 'admin-btn-danger' : 'admin-btn-primary'}
+            onClick={onConfirm}
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function AdminPage() {
-  const [authed, setAuthed]       = useState(() => sessionStorage.getItem('sh_admin') === 'true')
-  const [password, setPassword]   = useState('')
-  const [pwError, setPwError]     = useState(false)
+  const [authed, setAuthed]     = useState(() => sessionStorage.getItem('sh_admin') === 'true')
+  const [password, setPassword] = useState('')
+  const [pwError, setPwError]   = useState(false)
 
-  const [orders, setOrders]       = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [filter, setFilter]       = useState('All')
-  const [search, setSearch]       = useState('')
-  const [selected, setSelected]   = useState(null) // order detail modal
-  const [updating, setUpdating]   = useState(null) // order id being updated
+  const [orders, setOrders]     = useState([])
+  const [loading, setLoading]   = useState(true)
+  const [filter, setFilter]     = useState('All')
+  const [search, setSearch]     = useState('')
+  const [view, setView]         = useState('active')   // 'active' | 'archived'
+  const [selected, setSelected] = useState(null)
+  const [updating, setUpdating] = useState(null)
+  const [selectedIds, setSelectedIds] = useState(new Set())
+  const [confirm, setConfirm]   = useState(null)        // { title, msg, action, label, danger }
+  const [toast, setToast]       = useState(null)
 
+  const showToast = (msg, kind = 'success') => {
+    setToast({ msg, kind })
+    setTimeout(() => setToast(null), 2500)
+  }
+
+  /* ---------- AUTH ---------- */
   const login = () => {
     if (password === ADMIN_PASSWORD) {
       sessionStorage.setItem('sh_admin', 'true')
@@ -47,6 +78,7 @@ export default function AdminPage() {
     }
   }
 
+  /* ---------- FETCH ---------- */
   const fetchOrders = useCallback(async () => {
     setLoading(true)
     const { data, error } = await supabase
@@ -60,25 +92,57 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authed) return
     fetchOrders()
-
-    // Real-time subscription — new orders appear instantly
     const channel = supabase
       .channel('orders-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
       .subscribe()
-
     return () => supabase.removeChannel(channel)
   }, [authed, fetchOrders])
 
+  /* ---------- ACTIONS ---------- */
   const updateStatus = async (id, status) => {
     setUpdating(id)
-    await supabase.from('orders').update({ status }).eq('id', id)
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))
-    if (selected?.id === id) setSelected(prev => ({ ...prev, status }))
+    const { error } = await supabase.from('orders').update({ status }).eq('id', id)
+    if (!error) {
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))
+      if (selected?.id === id) setSelected(prev => ({ ...prev, status }))
+    }
     setUpdating(null)
   }
 
-  // ── Login screen ──────────────────────────────────────────
+  const archiveOrders = async (ids, archive = true) => {
+    const { error } = await supabase
+      .from('orders')
+      .update({ archived: archive, archived_at: archive ? new Date().toISOString() : null })
+      .in('id', ids)
+    if (error) return showToast('Action failed', 'error')
+    setOrders(prev => prev.map(o => ids.includes(o.id)
+      ? { ...o, archived: archive, archived_at: archive ? new Date().toISOString() : null }
+      : o))
+    setSelectedIds(new Set())
+    showToast(archive ? `Archived ${ids.length} order(s)` : `Restored ${ids.length} order(s)`)
+  }
+
+  const deleteOrders = async (ids) => {
+    const { error } = await supabase.from('orders').delete().in('id', ids)
+    if (error) return showToast('Delete failed', 'error')
+    setOrders(prev => prev.filter(o => !ids.includes(o.id)))
+    setSelectedIds(new Set())
+    if (selected && ids.includes(selected.id)) setSelected(null)
+    showToast(`Deleted ${ids.length} order(s)`)
+  }
+
+  const bulkUpdateStatus = async (status) => {
+    const ids = [...selectedIds]
+    if (!ids.length) return
+    const { error } = await supabase.from('orders').update({ status }).in('id', ids)
+    if (error) return showToast('Update failed', 'error')
+    setOrders(prev => prev.map(o => ids.includes(o.id) ? { ...o, status } : o))
+    setSelectedIds(new Set())
+    showToast(`Updated ${ids.length} order(s) to ${status}`)
+  }
+
+  /* ---------- LOGIN UI ---------- */
   if (!authed) {
     return (
       <div className="admin-login">
@@ -103,8 +167,10 @@ export default function AdminPage() {
     )
   }
 
-  // ── Filter + search ───────────────────────────────────────
-  const filtered = orders.filter(o => {
+  /* ---------- DERIVED ---------- */
+  const visible = useMemo(() => orders.filter(o => view === 'archived' ? o.archived : !o.archived), [orders, view])
+
+  const filtered = visible.filter(o => {
     const matchStatus = filter === 'All' || o.status === filter
     const q = search.toLowerCase()
     const matchSearch = !q ||
@@ -115,27 +181,47 @@ export default function AdminPage() {
   })
 
   const counts = STATUSES.reduce((acc, s) => {
-    acc[s] = orders.filter(o => o.status === s).length
+    acc[s] = visible.filter(o => o.status === s).length
     return acc
   }, {})
 
-  // ── Dashboard ─────────────────────────────────────────────
+  const activeCount   = orders.filter(o => !o.archived).length
+  const archivedCount = orders.filter(o => o.archived).length
+
+  const allSelected = filtered.length > 0 && filtered.every(o => selectedIds.has(o.id))
+  const toggleAll = () => {
+    if (allSelected) setSelectedIds(new Set())
+    else setSelectedIds(new Set(filtered.map(o => o.id)))
+  }
+  const toggleOne = (id) => {
+    const next = new Set(selectedIds)
+    next.has(id) ? next.delete(id) : next.add(id)
+    setSelectedIds(next)
+  }
+
+  /* ---------- DASHBOARD ---------- */
   return (
     <div className="admin-page">
-
       {/* Header */}
       <div className="admin-header">
         <div className="admin-header-left">
           <h1 className="admin-title">🍰 SweetHUB Orders</h1>
-          <p className="admin-subtitle">{orders.length} total orders</p>
+          <p className="admin-subtitle">
+            {activeCount} active · {archivedCount} archived
+          </p>
         </div>
         <div className="admin-header-right">
-          <button className="admin-refresh-btn" onClick={fetchOrders}>
-            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor">
-              <path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h80v280H520v-80h168q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 139-44t87-116h84q-28 106-114 173t-196 67Z"/>
-            </svg>
-            Refresh
-          </button>
+          <div className="admin-view-switch">
+            <button
+              className={view === 'active' ? 'active' : ''}
+              onClick={() => { setView('active'); setSelectedIds(new Set()) }}
+            >Active <span>{activeCount}</span></button>
+            <button
+              className={view === 'archived' ? 'active' : ''}
+              onClick={() => { setView('archived'); setSelectedIds(new Set()) }}
+            >Archived <span>{archivedCount}</span></button>
+          </div>
+          <button className="admin-refresh-btn" onClick={fetchOrders}>↻ Refresh</button>
           <button className="admin-logout-btn" onClick={() => { sessionStorage.removeItem('sh_admin'); setAuthed(false) }}>
             Sign Out
           </button>
@@ -145,20 +231,21 @@ export default function AdminPage() {
       {/* Stats cards */}
       <div className="admin-stats">
         {[
-          { label: 'Total Orders',    value: orders.length,                                              color: '#c0392b' },
-          { label: 'Pending',         value: counts['Pending'] || 0,                                     color: '#f0ad4e' },
-          { label: 'In Progress',     value: (counts['Confirmed'] || 0) + (counts['Preparing'] || 0),    color: '#2196f3' },
-          { label: 'Delivered',       value: counts['Delivered'] || 0,                                   color: '#27ae60' },
-          { label: 'Total Revenue',   value: fmt(orders.filter(o => o.status === 'Delivered').reduce((s, o) => s + o.total, 0)), color: '#7c3aed', isText: true },
+          { label: 'Total Orders',  value: activeCount, accent: '#c0392b' },
+          { label: 'Pending',       value: counts['Pending'] || 0, accent: '#f0ad4e' },
+          { label: 'In Progress',   value: (counts['Confirmed']||0)+(counts['Preparing']||0), accent: '#2196f3' },
+          { label: 'Delivered',     value: counts['Delivered'] || 0, accent: '#27ae60' },
+          { label: 'Revenue',       value: fmt(visible.filter(o => o.status === 'Delivered').reduce((s,o)=>s+Number(o.total||0),0)), accent: '#7c3aed' },
         ].map(s => (
           <div key={s.label} className="admin-stat-card">
+            <span className="admin-stat-bar" style={{ background: s.accent }} />
             <p className="admin-stat-label">{s.label}</p>
-            <p className="admin-stat-value" style={{ color: s.color }}>{s.value}</p>
+            <p className="admin-stat-value" style={{ color: s.accent }}>{s.value}</p>
           </div>
         ))}
       </div>
 
-      {/* Filters + search */}
+      {/* Controls */}
       <div className="admin-controls">
         <div className="admin-filter-tabs">
           {['All', ...STATUSES].map(s => (
@@ -168,9 +255,7 @@ export default function AdminPage() {
               onClick={() => setFilter(s)}
             >
               {s}
-              {s !== 'All' && counts[s] > 0 && (
-                <span className="admin-filter-count">{counts[s]}</span>
-              )}
+              {s !== 'All' && counts[s] > 0 && <span className="admin-filter-count">{counts[s]}</span>}
             </button>
           ))}
         </div>
@@ -183,21 +268,69 @@ export default function AdminPage() {
         />
       </div>
 
-      {/* Orders table */}
-      {loading ? (
-        <div className="admin-loading">
-          <div className="admin-spinner" />
-          <p>Loading orders...</p>
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="admin-bulkbar">
+          <div className="admin-bulkbar-info">
+            <strong>{selectedIds.size}</strong> selected
+            <button className="admin-bulkbar-clear" onClick={() => setSelectedIds(new Set())}>Clear</button>
+          </div>
+          <div className="admin-bulkbar-actions">
+            <select
+              className="admin-bulk-status"
+              defaultValue=""
+              onChange={e => { if (e.target.value) { bulkUpdateStatus(e.target.value); e.target.value = '' } }}
+            >
+              <option value="" disabled>Change status…</option>
+              {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+
+            {view === 'active' ? (
+              <button
+                className="admin-btn-secondary"
+                onClick={() => setConfirm({
+                  title: 'Archive orders?',
+                  msg: `Archive ${selectedIds.size} order(s)? They will be hidden but kept for your records.`,
+                  label: 'Archive',
+                  action: () => archiveOrders([...selectedIds], true),
+                })}
+              >📦 Archive</button>
+            ) : (
+              <button
+                className="admin-btn-secondary"
+                onClick={() => archiveOrders([...selectedIds], false)}
+              >↩ Restore</button>
+            )}
+
+            <button
+              className="admin-btn-danger"
+              onClick={() => setConfirm({
+                title: 'Delete permanently?',
+                msg: `Permanently delete ${selectedIds.size} order(s)? This cannot be undone.`,
+                label: 'Delete forever',
+                danger: true,
+                action: () => deleteOrders([...selectedIds]),
+              })}
+            >🗑 Delete</button>
+          </div>
         </div>
+      )}
+
+      {/* Table */}
+      {loading ? (
+        <div className="admin-loading"><div className="admin-spinner" /><p>Loading orders...</p></div>
       ) : filtered.length === 0 ? (
         <div className="admin-empty">
-          <p>No orders found {filter !== 'All' ? `with status "${filter}"` : ''}.</p>
+          <p>No {view} orders found{filter !== 'All' ? ` with status "${filter}"` : ''}.</p>
         </div>
       ) : (
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
               <tr>
+                <th style={{ width: 40 }}>
+                  <input type="checkbox" checked={allSelected} onChange={toggleAll} />
+                </th>
                 <th>Ref</th>
                 <th>Customer</th>
                 <th>Phone</th>
@@ -210,7 +343,18 @@ export default function AdminPage() {
             </thead>
             <tbody>
               {filtered.map(order => (
-                <tr key={order.id} className="admin-table-row" onClick={() => setSelected(order)}>
+                <tr
+                  key={order.id}
+                  className={`admin-table-row ${selectedIds.has(order.id) ? 'selected' : ''}`}
+                  onClick={() => setSelected(order)}
+                >
+                  <td onClick={e => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(order.id)}
+                      onChange={() => toggleOne(order.id)}
+                    />
+                  </td>
                   <td><span className="admin-ref">{order.order_ref}</span></td>
                   <td className="admin-name">{order.customer_name}</td>
                   <td className="admin-phone">{order.phone}</td>
@@ -231,19 +375,48 @@ export default function AdminPage() {
                     {new Date(order.created_at).toLocaleDateString('en-NG', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}
                   </td>
                   <td onClick={e => e.stopPropagation()}>
-                    <button
-                      className="admin-wa-btn"
-                      onClick={() => {
-                        const lines = order.items.map(i => `• ${i.name} × ${i.qty} = ${fmt(i.total)}`).join('\n')
-                        const msg = `Hi ${order.customer_name}! 👋 Your SweetHUB order *${order.order_ref}* has been confirmed ✅\n\n${lines}\n\n*Total: ${fmt(order.total)}*\n\nPlease send payment to:\nBank: GTB\nAccount: 012XXXXXXX\nName: SweetHUB\n\nThank you! 🍰`
-                        window.open(`https://wa.me/${order.phone.replace(/^0/, '234')}?text=${encodeURIComponent(msg)}`, '_blank')
-                      }}
-                      title="Message customer on WhatsApp"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 24 24" width="16px" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                      </svg>
-                    </button>
+                    <div className="admin-row-actions">
+                      <button
+                        className="admin-icon-btn admin-wa"
+                        title="WhatsApp customer"
+                        onClick={() => {
+                          const lines = (order.items || []).map(i => `• ${i.name} × ${i.qty} = ${fmt(i.total)}`).join('\n')
+                          const msg = `Hi ${order.customer_name}! 👋 Your SweetHUB order *${order.order_ref}* has been confirmed ✅\n\n${lines}\n\n*Total: ${fmt(order.total)}*\n\nThank you! 🍰`
+                          window.open(`https://wa.me/${order.phone.replace(/^0/, '234')}?text=${encodeURIComponent(msg)}`, '_blank')
+                        }}
+                      >💬</button>
+
+                      {view === 'active' ? (
+                        <button
+                          className="admin-icon-btn"
+                          title="Archive"
+                          onClick={() => setConfirm({
+                            title: 'Archive this order?',
+                            msg: `Archive ${order.order_ref}? You can restore it later.`,
+                            label: 'Archive',
+                            action: () => archiveOrders([order.id], true),
+                          })}
+                        >📦</button>
+                      ) : (
+                        <button
+                          className="admin-icon-btn"
+                          title="Restore"
+                          onClick={() => archiveOrders([order.id], false)}
+                        >↩</button>
+                      )}
+
+                      <button
+                        className="admin-icon-btn admin-danger"
+                        title="Delete permanently"
+                        onClick={() => setConfirm({
+                          title: 'Delete this order?',
+                          msg: `Permanently delete ${order.order_ref}? This cannot be undone.`,
+                          label: 'Delete forever',
+                          danger: true,
+                          action: () => deleteOrders([order.id]),
+                        })}
+                      >🗑</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -252,7 +425,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Order detail modal */}
+      {/* Detail modal */}
       {selected && (
         <div className="admin-modal-overlay" onClick={() => setSelected(null)}>
           <div className="admin-modal" onClick={e => e.stopPropagation()}>
@@ -302,9 +475,54 @@ export default function AdminPage() {
                   <span>{fmt(selected.total)}</span>
                 </div>
               </div>
+
+              <div className="admin-modal-footer">
+                {selected.archived ? (
+                  <button
+                    className="admin-btn-secondary"
+                    onClick={() => { archiveOrders([selected.id], false); setSelected(null) }}
+                  >↩ Restore order</button>
+                ) : (
+                  <button
+                    className="admin-btn-secondary"
+                    onClick={() => setConfirm({
+                      title: 'Archive this order?',
+                      msg: `Archive ${selected.order_ref}? You can restore it later.`,
+                      label: 'Archive',
+                      action: () => { archiveOrders([selected.id], true); setSelected(null) },
+                    })}
+                  >📦 Archive</button>
+                )}
+                <button
+                  className="admin-btn-danger"
+                  onClick={() => setConfirm({
+                    title: 'Delete this order?',
+                    msg: `Permanently delete ${selected.order_ref}? This cannot be undone.`,
+                    label: 'Delete forever',
+                    danger: true,
+                    action: () => { deleteOrders([selected.id]); setSelected(null) },
+                  })}
+                >🗑 Delete</button>
+              </div>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Confirm dialog */}
+      <ConfirmDialog
+        open={!!confirm}
+        title={confirm?.title}
+        message={confirm?.msg}
+        confirmLabel={confirm?.label}
+        danger={confirm?.danger}
+        onCancel={() => setConfirm(null)}
+        onConfirm={() => { confirm?.action?.(); setConfirm(null) }}
+      />
+
+      {/* Toast */}
+      {toast && (
+        <div className={`admin-toast ${toast.kind}`}>{toast.msg}</div>
       )}
     </div>
   )
