@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useAuth } from '../hooks/useAuth'
 
 // ── Images ────────────────────────────────────────────────────
 import imgPuffPuff    from '../assets/homepage/puff-puff-pepper.webp'
@@ -207,6 +208,7 @@ const PRODUCTS = [
   },
 ]
 
+
 const CATEGORIES     = ['All', 'Snacks', 'Pies', 'Cakes']
 const WHATSAPP_NUMBER = '2349029702549'
 const STORAGE_KEY    = 'sweethub_cart'
@@ -340,6 +342,7 @@ function UpsellToast({ product, pairProduct, onDismiss, onAddPair }) {
 
 // ── Checkout Modal ────────────────────────────────────────────
 function CheckoutModal({ cartItems, onClose, onSuccess }) {
+  const { user } = useAuth()                    // ✅ ADD THIS LINE — first line inside the component
   const [form, setForm]       = useState({ name: '', phone: '', email: '', address: '', notes: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
@@ -475,6 +478,7 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
         address:       form.address.trim(),
         notes:         form.notes.trim() || null,
         items, total, status: 'Pending',
+        user_id: user?.id ?? null,
       }])
       .select()
       .single()

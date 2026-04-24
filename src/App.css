@@ -237,6 +237,326 @@
 /* Hidden mobile navbar defaults */
 .m-navbar { display: none; }
 
+/* ══════════════════════════════
+   AUTH SWITCH BUTTON
+   ══════════════════════════════ */
+
+.navbar-auth-switch-wrap {
+  display: flex;
+  align-items: center;
+}
+
+/* Logged in — user identity + switch */
+.navbar-auth-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff8f3;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 5px 10px 5px 6px;
+  transition: box-shadow 0.2s;
+}
+
+.navbar-auth-user:hover {
+  box-shadow: 0 2px 10px rgba(192,57,43,0.1);
+}
+
+.navbar-auth-identity {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.navbar-avatar-sm {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.navbar-avatar-initial {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.navbar-auth-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── The switch button ── */
+.auth-switch-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.auth-switch-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: #ddd;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.auth-switch-btn.on .auth-switch-track {
+  background: #27ae60;
+}
+
+.auth-switch-btn.off .auth-switch-track {
+  background: #ddd;
+}
+
+.auth-switch-btn.switching .auth-switch-track {
+  background: #e67e22;
+}
+
+.auth-switch-thumb {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  left: 2px;
+}
+
+.auth-switch-btn.on .auth-switch-thumb {
+  transform: translateX(18px);
+}
+
+.auth-switch-btn.off .auth-switch-thumb {
+  transform: translateX(0);
+}
+
+.auth-switch-btn.switching .auth-switch-thumb {
+  transform: translateX(9px);
+}
+
+.auth-switch-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  min-width: 18px;
+}
+
+.auth-switch-btn.on .auth-switch-label {
+  color: #27ae60;
+}
+
+.auth-switch-btn.switching .auth-switch-label {
+  color: #e67e22;
+}
+
+/* Logged out — auth buttons */
+.navbar-auth-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-login-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navbar-login-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.navbar-signup-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 2px 10px rgba(192,57,43,0.28);
+}
+
+.navbar-signup-btn:hover {
+  background: var(--accent-h);
+  transform: translateY(-1px);
+}
+
+.auth-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.auth-modal{background:#fff;border-radius:16px;padding:32px;max-width:420px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.auth-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:28px;cursor:pointer;color:#999;line-height:1}
+.auth-title{margin:0 0 6px;font-size:24px;font-weight:700;color:#1a1a1a}
+.auth-sub{margin:0 0 20px;color:#666;font-size:14px}
+.auth-google{width:100%;padding:12px;border:1px solid #ddd;background:#fff;border-radius:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;transition:background .15s}
+.auth-google:hover:not(:disabled){background:#f7f7f7}
+.auth-divider{text-align:center;margin:16px 0;position:relative;color:#999;font-size:12px}
+.auth-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#eee}
+.auth-divider span{background:#fff;padding:0 12px;position:relative}
+.auth-form{display:flex;flex-direction:column;gap:10px}
+.auth-form input{padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;outline:none;transition:border-color .15s}
+.auth-form input:focus{border-color:#c0392b}
+.auth-submit{padding:12px;background:#c0392b;color:#fff;border:none;border-radius:10px;font-weight:600;font-size:15px;cursor:pointer;margin-top:6px}
+.auth-submit:disabled{opacity:.6;cursor:not-allowed}
+.auth-err{background:#fee;color:#c0392b;padding:10px;border-radius:8px;font-size:13px}
+.auth-info{background:#e8f8ee;color:#1a7a3e;padding:10px;border-radius:8px;font-size:13px}
+.auth-switch{text-align:center;margin-top:18px;font-size:14px;color:#666}
+.auth-switch button{background:none;border:none;color:#c0392b;font-weight:600;cursor:pointer;padding:0}
+
+
+/* ── Mobile menu auth ── */
+.m-menu-auth {
+  padding: 14px 20px 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.m-menu-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.m-menu-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.m-menu-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.m-menu-avatar-initial {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.m-menu-user-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.m-menu-user-email {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.m-menu-switch-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.m-menu-switch-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.m-menu-auth-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.m-menu-login {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.m-menu-login:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.m-menu-signup {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 3px 12px rgba(192,57,43,0.28);
+}
+
+.m-menu-signup:hover { background: var(--accent-h); }
+
 
 /* ══════════════════════════════
    HERO SECTION
@@ -2565,13 +2885,8 @@
 }
 
 
-/* ══════════════════════════════
-   ADMIN LOGIN
-   ══════════════════════════════ */
 /* ════════════════════════════════════════════════════════════════
-   SWEETHUB ADMIN — PREMIUM DASHBOARD
-   Append this to your App.css (or import as a separate file).
-   It REPLACES the previous .admin-* rules.
+   SWEET HUB ADMIN — PREMIUM DASHBOARD
    ════════════════════════════════════════════════════════════════ */
 
 :root {

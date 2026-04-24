@@ -1,6 +1,20 @@
 import { createClient } from '@supabase/supabase-js'
 
-const SUPABASE_URL = 'https://mbfkfggvlxbquyedbtxw.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iZmtmZ2d2bHhicXV5ZWRidHh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NTQzNDUsImV4cCI6MjA5MjAzMDM0NX0.kMY2m6Ie66s91o5zGcLOlZnHrzPiP7I30wrP9FTeuhU'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+if (!supabaseUrl || !supabaseAnonKey) {
+  // Loud, early failure beats a silent "Invalid URL" later.
+  // eslint-disable-next-line no-console
+  console.error(
+    '[supabaseClient] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in .env'
+  )
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true, // needed for Google OAuth redirect
+  },
+})

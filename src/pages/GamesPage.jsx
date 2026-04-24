@@ -1,9 +1,12 @@
 // This is the full /games page.
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useAuth } from '../hooks/useAuth'
+import { supabase } from '../lib/supabaseClient'
 
 // ── Config ────────────────────────────────────────────────────
 const WHATSAPP = '2349029702549'
 const fmt      = (n) => '₦' + n.toLocaleString()
+
 
 // ── Rewards ───────────────────────────────────────────────────
 const REWARDS = [
@@ -609,14 +612,32 @@ function CatchSnacks({ onWin }) {
 
 // ── REWARD SCREEN ─────────────────────────────────────────────
 function RewardScreen({ onClose }) {
+  const { user } = useAuth()                    // ✅ hook inside component
   const [chosen, setChosen] = useState(null)
   const [code, setCode]     = useState('')
   const [copied, setCopied] = useState(false)
+  const [claiming, setClaiming] = useState(false)
 
-  const pick = (r) => { setChosen(r); setCode(genCode(r.code)) }
+  const pick = async (r) => {
+    if (!user) {
+      alert('Please log in or sign up to claim your reward!')
+      return
+    }
+    setClaiming(true)
+    const { data, error } = await supabase.rpc('claim_reward', {
+      _reward_id:    r.id,
+      _reward_label: r.label,
+    })
+    setClaiming(false)
+    if (error) { alert(error.message); return }
+    setChosen(r)
+    setCode(data?.[0]?.coupon_code || genCode(r.code))
+  }
 
   const copy = () => {
-    navigator.clipboard.writeText(code).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000) })
+    navigator.clipboard.writeText(code).then(() => {
+      setCopied(true); setTimeout(() => setCopied(false), 2000)
+    })
   }
 
   if (chosen) return (
