@@ -73,24 +73,12 @@ function App() {
   const [cartItems, setCartItems]           = useState([])
   const [showCountdown, setShowCountdown]   = useState(false)
 
-  // Show countdown when user returns from WhatsApp tab
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible') {
-        const ordered = sessionStorage.getItem('sweethub_ordered')
-        if (ordered === 'true') {
-        }
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [])
-
   const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0)
   const addToCart = (items) => setCartItems(items)
 
   return (
     <BrowserRouter>
+    <OrderBanner />
       <Routes>
         <Route
           path="/"

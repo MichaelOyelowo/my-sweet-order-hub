@@ -1,43 +1,215 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
+// ── Images ────────────────────────────────────────────────────
 import imgPuffPuff    from '../assets/homepage/puff-puff-pepper.webp'
+import imgPuffPuff1 from '../assets/homepage/puff-puff1.webp'
+import imgPuffPuff2 from '../assets/homepage/puff-puff.webp'
 import imgChinChin    from '../assets/homepage/crumpy-chin-chin.webp'
+import imgChinChin1    from '../assets/chin-chin/chin1.webp'
+import imgChinChin2    from '../assets/chin-chin/chin2.webp'
 import imgBananaBread from '../assets/homepage/sliced-peanut-butter-banana-bread.webp'
-import imgFishRoll    from '../assets/homepage/fish-roll.webp'
-import imgSausageRoll from '../assets/homepage/sausage-roll.webp'
-import imgSpringRoll  from '../assets/homepage/spring-roll-samosa.webp'
-import imgFrankRoll   from '../assets/homepage/frank-roll.webp'
-import imgBuns        from '../assets/homepage/burger-buns.webp'
-import imgDoughnut    from '../assets/homepage/mixdoughnut.webp'
-import imgEggRoll     from '../assets/homepage/eggroll.webp'
-import imgMeatPie     from '../assets/homepage/meatpie.webp'
-import imgChickenPie  from '../assets/homepage/chicken-pie.webp'
-import imgSmallCake   from '../assets/homepage/cupcake-chocolate.webp'
-import imgMediumCake  from '../assets/homepage/cupcake.webp'
-import imgParfait     from '../assets/homepage/cakeparfait.webp'
+import imgBananaBread1 from '../assets/banana-breads/banana-bread1.webp'
+import imgBananaBread2 from '../assets/banana-breads/banana-bread5.webp'
+import imgFishRoll1    from '../assets/fish-roll/fish-roll1.webp'
+import imgFishRoll2    from '../assets/fish-roll/fish-roll4.webp'
+import imgFishRoll3    from '../assets/fish-roll/fish-roll5.webp'
+import imgSausageRoll1 from '../assets/sausage/sausage5.webp'
+import imgSausageRoll2 from '../assets/sausage/sausage4.webp'
+import imgSausageRoll3 from '../assets/sausage/sausage2.webp'
+import imgSamosa1  from '../assets/samosa/samosa1.webp'
+import imgSamosa2  from '../assets/samosa/samosa4.webp'
+import imgSamosa3  from '../assets/samosa/samosa5.webp'
+import imgSpringRoll1 from '../assets/spring-rolls/spring-roll1.webp'
+import imgSpringRoll2 from '../assets/spring-rolls/spring-roll2.webp'
+import imgSpringRoll3 from '../assets/spring-rolls/spring-roll3.webp'
+import imgFrankRoll1   from '../assets/frank-rolls/frank-roll.webp'
+import imgFrankRoll2   from '../assets/frank-rolls/frank-roll1.webp'
+import imgFrankRoll3   from '../assets/frank-rolls/frank-roll2.webp'
+import imgBuns1  from '../assets/buns/buns1.webp'
+import imgBuns2  from '../assets/buns/buns2.webp'
+import imgBuns3  from '../assets/buns/buns3.webp'
+import imgDoughnut1    from '../assets/doughnuts/doughnut2.webp'
+import imgDoughnut2    from '../assets/doughnuts/doughnut5.webp'
+import imgDoughnut3    from '../assets/doughnuts/doughnut6.webp'
+import imgEggRoll1    from '../assets/homepage/eggroll.webp'
+import imgEggRoll2    from '../assets/homepage/egg-roll1.webp'
+import imgEggRoll3    from '../assets/homepage/egg-roll2.webp'
+import imgMeatPie1    from '../assets/homepage/meat-pie.webp'
+import imgMeatPie2     from '../assets/homepage/meat-pie1.webp'
+import imgMeatPie3     from '../assets/homepage/meat-pie2.webp'
+import imgChickenPie1  from '../assets/homepage/chicken-pie1.webp'
+import imgChickenPie2  from '../assets/homepage/chicken-pie2.webp'
+import imgChickenPie3  from '../assets/homepage/chicken-pie3.webp'
+import imgSmallCake1   from '../assets/cakes/cupcake1.webp'
+import imgSmallCake2  from '../assets/cakes/cupcake2.webp'
+import imgSmallCake3   from '../assets/cakes/cupcake3.webp'
+import imgMediumCake1  from '../assets/homepage/cupcake.webp'
+import imgMediumCake2   from '../assets/cakes/cupcake4.webp'
+import imgMediumCake3   from '../assets/cakes/cupcake5.webp'
 
+import imgParfait1 from '../assets/cakes/cakeparfait.webp'
+import imgParfait2 from  '../assets/cakes/cake-parfait1.webp'
+import imgParfait3 from '../assets/cakes/cake-parfait2.webp'
+
+
+
+// ══════════════════════════════════════════════════════════════
+// PRODUCTS — each item has an `images` array.
+//   images: [imgPuffPuff, imgPuffPuff2, imgPuffPuff3]
+// The hover cycle will pick them up automatically — no other
+// code changes needed.
+// ══════════════════════════════════════════════════════════════
 const PRODUCTS = [
-  { id: 1,  name: 'Puff Puff',            img: imgPuffPuff,    price: 100,  unit: 'piece',  moq: 5, category: 'Snacks', pairWith: [2, 9]  },
-  { id: 2,  name: 'Chin-Chin',            img: imgChinChin,    price: 100,  unit: 'sachet', moq: 5, category: 'Snacks', pairWith: [1, 8]  },
-  { id: 3,  name: 'Banana Bread',         img: imgBananaBread, price: 200,  unit: 'piece',  moq: 3, category: 'Snacks', pairWith: [13,14] },
-  { id: 4,  name: 'Fish Roll',            img: imgFishRoll,    price: 200,  unit: 'piece',  moq: 3, category: 'Snacks', pairWith: [5, 7]  },
-  { id: 5,  name: 'Sausage Roll',         img: imgSausageRoll, price: 200,  unit: 'piece',  moq: 3, category: 'Snacks', pairWith: [4, 6]  },
-  { id: 6,  name: 'Spring Roll & Samosa', img: imgSpringRoll,  price: 200,  unit: 'piece',  moq: 3, category: 'Snacks', pairWith: [5, 10] },
-  { id: 7,  name: 'Frank Roll',           img: imgFrankRoll,   price: 200,  unit: 'piece',  moq: 3, category: 'Snacks', pairWith: [4, 11] },
-  { id: 8,  name: 'Buns',                 img: imgBuns,        price: 200,  unit: 'piece',  moq: 3, category: 'Snacks', pairWith: [2, 9]  },
-  { id: 9,  name: 'Doughnut',             img: imgDoughnut,    price: 300,  unit: 'piece',  moq: 2, category: 'Snacks', pairWith: [13,15] },
-  { id: 10, name: 'Egg Roll',             img: imgEggRoll,     price: 500,  unit: 'piece',  moq: 1, category: 'Pies',   pairWith: [11,12] },
-  { id: 11, name: 'Meat Pie',             img: imgMeatPie,     price: 500,  unit: 'piece',  moq: 1, category: 'Pies',   pairWith: [10,12] },
-  { id: 12, name: 'Chicken Pie',          img: imgChickenPie,  price: 500,  unit: 'piece',  moq: 1, category: 'Pies',   pairWith: [10,11] },
-  { id: 13, name: 'Small Cupcake',        img: imgSmallCake,   price: 300,  unit: 'piece',  moq: 2, category: 'Cakes',  pairWith: [14,15] },
-  { id: 14, name: 'Medium Cupcake',       img: imgMediumCake,  price: 500,  unit: 'piece',  moq: 1, category: 'Cakes',  pairWith: [13,15] },
-  { id: 15, name: 'Cake Parfait',         img: imgParfait,     price: 1500, unit: 'piece',  moq: 1, category: 'Cakes',  pairWith: [13,14] },
+  {
+    id: 1, name: 'Puff Puff', category: 'Snacks',
+    price: 100, unit: 'piece', moq: 5, pairWith: [2, 9],
+    images: [
+      imgPuffPuff,
+      imgPuffPuff1,
+      imgPuffPuff2,
+    ],
+  },
+  {
+    id: 2, name: 'Chin-Chin', category: 'Snacks',
+    price: 100, unit: 'sachet', moq: 5, pairWith: [1, 8],
+    images: [
+      imgChinChin,
+      imgChinChin1,
+      imgChinChin2,
+    ],
+  },
+  {
+    id: 3, name: 'Banana Bread', category: 'Snacks',
+    price: 200, unit: 'piece', moq: 3, pairWith: [13, 14],
+    images: [
+      imgBananaBread,
+      imgBananaBread1,
+      imgBananaBread2,
+    ],
+  },
+  {
+    id: 4, name: 'Fish Roll', category: 'Snacks',
+    price: 200, unit: 'piece', moq: 3, pairWith: [5, 7],
+    images: [
+      imgFishRoll1,
+      imgFishRoll2,
+      imgFishRoll3,
+    ],
+  },
+  {
+    id: 5, name: 'Sausage Roll', category: 'Snacks',
+    price: 200, unit: 'piece', moq: 3, pairWith: [4, 6],
+    images: [
+      imgSausageRoll1,
+      imgSausageRoll2,
+      imgSausageRoll3,
+    ],
+  },
+  {
+    id: 6, name: 'Samosa', category: 'Snacks',
+    price: 200, unit: 'piece', moq: 3, pairWith: [5, 10],
+    images: [
+      imgSamosa1,
+      imgSamosa2,
+      imgSamosa3,
+    ],
+  },
+  {
+    id: 7, name: 'Spring Roll', category: 'Snacks',
+    price: 200, unit: 'piece', moq: 3, pairWith: [5, 10],
+    images: [
+      imgSpringRoll1,
+      imgSpringRoll2,
+      imgSpringRoll3,
+    ],
+  },
+  {
+    id: 8, name: 'Frank Roll', category: 'Snacks',
+    price: 200, unit: 'piece', moq: 3, pairWith: [4, 11],
+    images: [
+      imgFrankRoll1,
+      imgFrankRoll2,
+      imgFrankRoll3,
+    ],
+  },
+  {
+    id: 9, name: 'Buns', category: 'Snacks',
+    price: 200, unit: 'piece', moq: 3, pairWith: [2, 9],
+    images: [
+      imgBuns1,
+      imgBuns2,
+      imgBuns3,
+    ],
+  },
+  {
+    id: 10, name: 'Doughnut', category: 'Snacks',
+    price: 300, unit: 'piece', moq: 2, pairWith: [13, 15],
+    images: [
+      imgDoughnut3,
+      imgDoughnut2,
+      imgDoughnut1,
+    ],
+  },
+  {
+    id: 11, name: 'Egg Roll', category: 'Pies',
+    price: 500, unit: 'piece', moq: 1, pairWith: [11, 12],
+    images: [
+      imgEggRoll1,
+      imgEggRoll2,
+      imgEggRoll3,
+    ],
+  },
+  {
+    id: 12, name: 'Meat Pie', category: 'Pies',
+    price: 500, unit: 'piece', moq: 1, pairWith: [10, 12],
+    images: [
+      imgMeatPie1,
+      imgMeatPie2,
+      imgMeatPie3,
+    ],
+  },
+  {
+    id: 13, name: 'Chicken Pie', category: 'Pies',
+    price: 500, unit: 'piece', moq: 1, pairWith: [10, 11],
+    images: [
+      imgChickenPie1,
+      imgChickenPie2,
+      imgChickenPie3,
+    ],
+  },
+  {
+    id: 14, name: 'Small Cupcake', category: 'Cakes',
+    price: 300, unit: 'piece', moq: 2, pairWith: [14, 15],
+    images: [
+      imgSmallCake1,
+      imgSmallCake2,
+      imgSmallCake3,
+    ],
+  },
+  {
+    id: 15, name: 'Medium Cupcake', category: 'Cakes',
+    price: 500, unit: 'piece', moq: 1, pairWith: [13, 15],
+    images: [
+      imgMediumCake1,
+      imgMediumCake2,
+      imgMediumCake3,
+    ],
+  },
+  {
+    id: 16, name: 'Cake Parfait', category: 'Cakes',
+    price: 1500, unit: 'piece', moq: 1, pairWith: [13, 14],
+    images: [
+      imgParfait1,
+      imgParfait2,
+      imgParfait3,
+    ],
+  },
 ]
 
-const CATEGORIES    = ['All', 'Snacks', 'Pies', 'Cakes']
+const CATEGORIES     = ['All', 'Snacks', 'Pies', 'Cakes']
 const WHATSAPP_NUMBER = '2349029702549'
-const STORAGE_KEY   = 'sweethub_cart'
+const STORAGE_KEY    = 'sweethub_cart'
 const fmt = (n) => '₦' + n.toLocaleString()
 
 const UPSELL_MSGS = [
@@ -56,90 +228,87 @@ const saveCart = (items) => {
 }
 
 
-// ── Countdown Timer ───────────────────────────────────────────
-// function CountdownTimer({ onClose, orderRef }) {
-//   const TOTAL = 90 * 60
-//   const [seconds, setSeconds] = useState(TOTAL)
-//   const [phase, setPhase]     = useState('preparing')
-//   const intervalRef           = useRef(null)
+// ══════════════════════════════════════════════════════════════
+// PRODUCT IMAGE CYCLER
+// Shows the first image by default.
+// On hover: cycles through the images array every 700ms.
+// On mouse leave: snaps back to the first image.
+// The dot indicators at the bottom show which image is active.
+// ══════════════════════════════════════════════════════════════
+function ProductImageCycler({ images, alt, inCart }) {
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
+  const intervalRef = useRef(null)
+  const hasMultiple = images.length > 1
 
-//   useEffect(() => {
-//     intervalRef.current = setInterval(() => {
-//       setSeconds(prev => {
-//         const next = prev - 1
-//         if (next <= 0) { clearInterval(intervalRef.current); setPhase('ready'); return 0 }
-//         if (next === 60 * 60) setPhase('ready_soon')
-//         return next
-//       })
-//     }, 1000)
-//     return () => clearInterval(intervalRef.current)
-//   }, [])
+  const startCycling = () => {
+    if (!hasMultiple) return
+    setIsHovered(true)
+    // Start from next image immediately on hover
+    setActiveIdx(1 % images.length)
+    intervalRef.current = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % images.length)
+    }, 700)
+  }
 
-//   const mins     = Math.floor(seconds / 60)
-//   const secs     = seconds % 60
-//   const progress = ((TOTAL - seconds) / TOTAL) * 100
+  const stopCycling = () => {
+    setIsHovered(false)
+    clearInterval(intervalRef.current)
+    // Snap back to first image
+    setActiveIdx(0)
+  }
 
-//   const phases = {
-//     preparing:  { emoji: '👨‍🍳', title: "We're preparing your order!", msg: 'Our team has received your order and is getting started. Fresh and made with love ❤️', color: '#c0392b' },
-//     ready_soon: { emoji: '🎉', title: 'Almost ready!',                  msg: 'Your order will be ready in about 30 minutes. Get excited! 🛵',                        color: '#e67e22' },
-//     ready:      { emoji: '✅', title: 'Your order is ready!',           msg: 'Your SweetHUB order is on its way to you right now. Enjoy! 🎊',                        color: '#27ae60' },
-//   }
-//   const cur = phases[phase]
+  // Cleanup on unmount
+  useEffect(() => () => clearInterval(intervalRef.current), [])
 
-//   return (
-//     <div className="countdown-overlay">
-//       <div className="countdown-card">
-//         <button className="countdown-close" onClick={onClose} aria-label="Close">
-//           <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
-//             <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
-//           </svg>
-//         </button>
+  return (
+    <div
+      className="pc-img-wrap"
+      onMouseEnter={startCycling}
+      onMouseLeave={stopCycling}
+      // Touch support — tap to cycle on mobile
+      onTouchStart={() => {
+        if (!hasMultiple) return
+        setActiveIdx(prev => (prev + 1) % images.length)
+      }}
+    >
+      {/* All images stacked — only active one is visible */}
+      {images.map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt={i === 0 ? alt : `${alt} view ${i + 1}`}
+          className={`pc-img pc-img-slide ${i === activeIdx ? 'pc-img-active' : ''}`}
+          loading={i === 0 ? 'eager' : 'lazy'}
+        />
+      ))}
 
-//         {orderRef && (
-//           <div className="countdown-order-ref">Order {orderRef}</div>
-//         )}
+      {/* In cart badge */}
+      {inCart && <span className="pc-in-cart-badge">✓ In Cart</span>}
 
-//         <div className="countdown-emoji">{cur.emoji}</div>
-//         <h3 className="countdown-title">{cur.title}</h3>
-//         <p className="countdown-msg">{cur.msg}</p>
+      {/* MOQ badge — shown via parent, not here */}
 
-//         {phase !== 'ready' && (
-//           <>
-//             <div className="countdown-timer">
-//               <span className="countdown-digits">
-//                 {String(mins).padStart(2, '0')}
-//                 <span className="countdown-colon">:</span>
-//                 {String(secs).padStart(2, '0')}
-//               </span>
-//               <span className="countdown-label">estimated time remaining</span>
-//             </div>
-//             <div className="countdown-bar-wrap">
-//               <div className="countdown-bar-fill" style={{ width: `${progress}%`, background: cur.color }} />
-//             </div>
-//           </>
-//         )}
+      {/* Image dot indicators — only show if multiple images */}
+      {hasMultiple && (
+        <div className="pc-img-dots" aria-hidden="true">
+          {images.map((_, i) => (
+            <span
+              key={i}
+              className={`pc-img-dot ${i === activeIdx ? 'active' : ''}`}
+            />
+          ))}
+        </div>
+      )}
 
-//         <div className="countdown-steps">
-//           <div className={`countdown-step ${['preparing','ready_soon','ready'].includes(phase) ? 'done' : ''}`}>
-//             <div className="cs-dot" /><span>Order received</span>
-//           </div>
-//           <div className="countdown-step-line" />
-//           <div className={`countdown-step ${['ready_soon','ready'].includes(phase) ? 'done' : ''}`}>
-//             <div className="cs-dot" /><span>Being prepared</span>
-//           </div>
-//           <div className="countdown-step-line" />
-//           <div className={`countdown-step ${phase === 'ready' ? 'done' : ''}`}>
-//             <div className="cs-dot" /><span>Out for delivery</span>
-//           </div>
-//         </div>
-
-//         {phase === 'ready' && (
-//           <button className="countdown-done-btn" onClick={onClose}>Close & Continue Shopping</button>
-//         )}
-//       </div>
-//     </div>
-//   )
-// }
+      {/* Hover hint — only shows on first hover before cycling starts */}
+      {hasMultiple && !isHovered && (
+        <div className="pc-img-hint" aria-hidden="true">
+          <span>Hover to see more</span>
+        </div>
+      )}
+    </div>
+  )
+}
 
 
 // ── Upsell Toast ──────────────────────────────────────────────
@@ -155,7 +324,7 @@ function UpsellToast({ product, pairProduct, onDismiss, onAddPair }) {
   return (
     <div className="upsell-toast" role="alert" aria-live="polite">
       <div className="upsell-toast-img">
-        <img src={pairProduct.img} alt={pairProduct.name} />
+        <img src={pairProduct.images[0]} alt={pairProduct.name} />
       </div>
       <div className="upsell-toast-body">
         <p className="upsell-toast-msg">{msg}</p>
@@ -169,8 +338,7 @@ function UpsellToast({ product, pairProduct, onDismiss, onAddPair }) {
 }
 
 
-// ── Checkout Modal ─────────────────────────────────────────────
-
+// ── Checkout Modal ────────────────────────────────────────────
 function CheckoutModal({ cartItems, onClose, onSuccess }) {
   const [form, setForm]       = useState({ name: '', phone: '', email: '', address: '', notes: '' })
   const [loading, setLoading] = useState(false)
@@ -179,10 +347,7 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
   const total  = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0)
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
-  // ── Send confirmation email via Resend ──────────────────────
   const sendEmail = async (orderRef) => {
-
-    // Build the items rows for the email table
     const itemRows = cartItems.map(i => `
       <tr>
         <td style="padding:10px 14px;border-bottom:1px solid #faf4ef;font-size:14px;color:#1a1a1a;">${i.name}</td>
@@ -191,148 +356,104 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
       </tr>
     `).join('')
 
-    const html = `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/></head>
 <body style="margin:0;padding:0;background:#f8f4f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f4f0;padding:40px 16px;">
-    <tr><td align="center">
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
-
-        <!-- Logo -->
-        <tr><td align="center" style="padding-bottom:24px;">
-          <h1 style="margin:0;font-size:32px;font-weight:800;color:#c0392b;letter-spacing:-1px;">Sweet<em>HUB</em></h1>
-          <p style="margin:4px 0 0;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em;">Fresh & Made to Order</p>
-        </td></tr>
-
-        <!-- Card -->
-        <tr><td style="background:white;border-radius:20px;overflow:hidden;">
-
-          <!-- Banner -->
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="background:#c0392b;padding:28px 32px;text-align:center;">
-              <div style="font-size:40px;margin-bottom:10px;">🎉</div>
-              <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:white;">Order Confirmed!</h2>
-              <p style="margin:0;font-size:14px;color:rgba(255,255,255,0.85);">We've received your order and we're getting started</p>
-            </td></tr>
-          </table>
-
-          <!-- Order ref -->
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="padding:24px 32px 0;text-align:center;">
-              <span style="display:inline-block;background:rgba(192,57,43,0.08);color:#c0392b;font-size:13px;font-weight:700;padding:6px 18px;border-radius:20px;letter-spacing:0.05em;">
-                Order ${orderRef}
-              </span>
-            </td></tr>
-          </table>
-
-          <!-- Greeting -->
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="padding:20px 32px 8px;">
-              <p style="margin:0;font-size:15px;color:#1a1a1a;line-height:1.6;">
-                Hi <strong>${form.name}</strong> 👋,<br/>
-                Thank you for your order! Here's a summary of what you ordered.
-                We'll send you a WhatsApp message shortly with payment details.
-              </p>
-            </td></tr>
-          </table>
-
-          <!-- Items table -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0 0;">
-            <tr><td style="padding:0 32px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #faf4ef;border-radius:12px;overflow:hidden;">
-                <thead>
-                  <tr style="background:#faf3ee;">
-                    <th style="padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;text-align:left;">Item</th>
-                    <th style="padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;text-align:center;">Qty</th>
-                    <th style="padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;text-align:right;">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>${itemRows}</tbody>
-                <tfoot>
-                  <tr style="background:#fff8f3;">
-                    <td colspan="2" style="padding:14px;font-size:15px;font-weight:700;color:#1a1a1a;">Total</td>
-                    <td style="padding:14px;font-size:18px;font-weight:800;color:#c0392b;text-align:right;">₦${total.toLocaleString()}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </td></tr>
-          </table>
-
-          <!-- Delivery info -->
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="padding:20px 32px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background:#faf7f4;border-radius:12px;">
-                <tr><td style="padding:16px;">
-                  <p style="margin:0 0 6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;">Delivery Address</p>
-                  <p style="margin:0;font-size:14px;color:#1a1a1a;">📍 ${form.address}</p>
-                  ${form.notes ? `<p style="margin:8px 0 0;font-size:13px;color:#888;">📝 ${form.notes}</p>` : ''}
-                </td></tr>
-              </table>
-            </td></tr>
-          </table>
-
-          <!-- Notice -->
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="padding:0 32px 28px;">
-              <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff8f0;border:1px solid #f0e6dc;border-radius:12px;">
-                <tr><td style="padding:14px 16px;font-size:13px;color:#888;line-height:1.6;">
-                  ⏱️ <strong style="color:#1a1a1a;">Preparation time:</strong>
-                  Please allow <strong style="color:#c0392b;">1 hour 30 minutes</strong> for your order to be freshly prepared.
-                  We will message you on WhatsApp when it's ready.
-                </td></tr>
-              </table>
-            </td></tr>
-          </table>
-
-        </td></tr>
-
-        <!-- Footer -->
-        <tr><td style="padding:24px 0 0;text-align:center;">
-          <p style="margin:0 0 4px;font-size:13px;color:#888;">
-            Questions? WhatsApp us at
-            <a href="https://wa.me/2349029702549" style="color:#c0392b;text-decoration:none;font-weight:600;">+234 902 970 2549</a>
-          </p>
-          <p style="margin:0;font-size:11px;color:#bbb;">© ${new Date().getFullYear()} SweetHUB · Fresh & Made to Order</p>
-        </td></tr>
-
-      </table>
-    </td></tr>
+    <tr><td align="center"><table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+      <tr><td align="center" style="padding-bottom:24px;">
+        <h1 style="margin:0;font-size:32px;font-weight:800;color:#c0392b;">SweetHUB</h1>
+        <p style="margin:4px 0 0;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.1em;">Fresh & Made to Order</p>
+      </td></tr>
+      <tr><td style="background:white;border-radius:20px;overflow:hidden;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr><td style="background:#c0392b;padding:28px 32px;text-align:center;">
+            <div style="font-size:40px;margin-bottom:10px;">🎉</div>
+            <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:white;">Order Confirmed!</h2>
+            <p style="margin:0;font-size:14px;color:rgba(255,255,255,0.85);">We've received your order and we're getting started</p>
+          </td></tr>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr><td style="padding:24px 32px 0;text-align:center;">
+            <span style="display:inline-block;background:rgba(192,57,43,0.08);color:#c0392b;font-size:13px;font-weight:700;padding:6px 18px;border-radius:20px;">Order ${orderRef}</span>
+          </td></tr>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr><td style="padding:20px 32px 8px;">
+            <p style="margin:0;font-size:15px;color:#1a1a1a;line-height:1.6;">
+              Hi <strong>${form.name}</strong> 👋,<br/>
+              Thank you for your order! We'll send you a WhatsApp message shortly with payment details.
+            </p>
+          </td></tr>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0 0;">
+          <tr><td style="padding:0 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #faf4ef;border-radius:12px;overflow:hidden;">
+              <thead><tr style="background:#faf3ee;">
+                <th style="padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;color:#888;text-align:left;">Item</th>
+                <th style="padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;color:#888;text-align:center;">Qty</th>
+                <th style="padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;color:#888;text-align:right;">Amount</th>
+              </tr></thead>
+              <tbody>${itemRows}</tbody>
+              <tfoot><tr style="background:#fff8f3;">
+                <td colspan="2" style="padding:14px;font-size:15px;font-weight:700;color:#1a1a1a;">Total</td>
+                <td style="padding:14px;font-size:18px;font-weight:800;color:#c0392b;text-align:right;">₦${total.toLocaleString()}</td>
+              </tr></tfoot>
+            </table>
+          </td></tr>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr><td style="padding:20px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#faf7f4;border-radius:12px;">
+              <tr><td style="padding:16px;">
+                <p style="margin:0 0 6px;font-size:11px;font-weight:700;text-transform:uppercase;color:#888;">Delivery Address</p>
+                <p style="margin:0;font-size:14px;color:#1a1a1a;">📍 ${form.address}</p>
+                ${form.notes ? `<p style="margin:8px 0 0;font-size:13px;color:#888;">📝 ${form.notes}</p>` : ''}
+              </td></tr>
+            </table>
+          </td></tr>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr><td style="padding:0 32px 28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff8f0;border:1px solid #f0e6dc;border-radius:12px;">
+              <tr><td style="padding:14px 16px;font-size:13px;color:#888;line-height:1.6;">
+                ⏱️ <strong style="color:#1a1a1a;">Preparation time:</strong>
+                Please allow <strong style="color:#c0392b;">1 hour 30 minutes</strong> for fresh preparation.
+              </td></tr>
+            </table>
+          </td></tr>
+        </table>
+      </td></tr>
+      <tr><td style="padding:24px 0 0;text-align:center;">
+        <p style="margin:0 0 4px;font-size:13px;color:#888;">Questions? WhatsApp us at
+          <a href="https://wa.me/2349029702549" style="color:#c0392b;text-decoration:none;font-weight:600;">+234 902 970 2549</a>
+        </p>
+        <p style="margin:0;font-size:11px;color:#bbb;">© ${new Date().getFullYear()} SweetHUB · Fresh & Made to Order</p>
+      </td></tr>
+    </table></td></tr>
   </table>
-</body>
-</html>`
+</body></html>`
 
-    // Call Resend API directly
     try {
-          // No API Key needed here anymore! Just the worker URL.
-    await fetch('https://sweethub-emails.michaelkingreat.workers.dev', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from:    'SweetHUB <onboarding@resend.dev>', // Remember, use your verified Resend email to test!
-        to:      [form.email],
-        subject: `Order ${orderRef} Confirmed 🎉 – SweetHUB`,
-        html,
-      }),
-    })
+      await fetch('https://sweethub-emails.michaelkingreat.workers.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from:    'SweetHUB <onboarding@resend.dev>',
+          to:      [form.email],
+          subject: `Order ${orderRef} Confirmed 🎉 – SweetHUB`,
+          html,
+        }),
+      })
     } catch (err) {
-      // Email failure is non-critical — order still goes through
       console.warn('Email send failed (non-critical):', err)
     }
   }
 
-  // ── Main submit handler ─────────────────────────────────────
   const handleSubmit = async () => {
-    // Validate all required fields
     if (!form.name.trim() || !form.phone.trim() || !form.email.trim() || !form.address.trim()) {
       setError('Please fill in all required fields.')
       return
     }
-
-    // Basic email format check
     if (!/\S+@\S+\.\S+/.test(form.email)) {
       setError('Please enter a valid email address.')
       return
@@ -341,16 +462,10 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
     setLoading(true)
     setError('')
 
-    // 1. Build items for Supabase
     const items = cartItems.map(i => ({
-      id:    i.id,
-      name:  i.name,
-      qty:   i.qty,
-      price: i.price,
-      total: i.price * i.qty,
+      id: i.id, name: i.name, qty: i.qty, price: i.price, total: i.price * i.qty,
     }))
 
-    // 2. Save order to Supabase
     const { data, error: dbError } = await supabase
       .from('orders')
       .insert([{
@@ -359,75 +474,53 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
         email:         form.email.trim(),
         address:       form.address.trim(),
         notes:         form.notes.trim() || null,
-        items,
-        total,
-        status: 'Pending',
+        items, total, status: 'Pending',
       }])
       .select()
       .single()
 
     if (dbError) {
       console.error('Supabase error:', dbError)
-      setError('Something went wrong saving your order. Please try again.')
+      setError('Something went wrong. Please try again.')
       setLoading(false)
       return
     }
 
     const orderRef = data.order_ref
-
-    // 3. Send confirmation email (non-blocking — runs in background)
     sendEmail(orderRef)
 
-    // 4. Build WhatsApp message
     const lines = cartItems
       .map(i => `• ${i.name} × ${i.qty} = ₦${(i.price * i.qty).toLocaleString()}`)
       .join('\n')
 
     const msg =
       `Hello SweetHUB! 🍰 I just placed an order:\n\n` +
-      `🔖 Order Ref: *${orderRef}*\n\n` +
-      `${lines}\n\n` +
+      `🔖 Order Ref: *${orderRef}*\n\n${lines}\n\n` +
       `*Total: ₦${total.toLocaleString()}*\n\n` +
-      `👤 Name: ${form.name}\n` +
-      `📞 Phone: ${form.phone}\n` +
-      `📍 Address: ${form.address}\n` +
+      `👤 Name: ${form.name}\n📞 Phone: ${form.phone}\n📍 Address: ${form.address}\n` +
       `${form.notes ? `📝 Notes: ${form.notes}\n` : ''}` +
       `\nPlease confirm my order. Thank you! 😊`
 
     setLoading(false)
-
-    // 5. Set session flags for countdown timer
     sessionStorage.setItem('sweethub_ordered', 'true')
     sessionStorage.setItem('sweethub_order_ref', orderRef)
-
-    // 6. Trigger success — clears cart, closes modal
     onSuccess(orderRef)
-
-    // 7. Open WhatsApp
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
-  // ── Render ──────────────────────────────────────────────────
   return (
     <div className="countdown-overlay" role="dialog" aria-modal="true" aria-label="Complete your order">
       <div className="checkout-modal">
-
         <button className="countdown-close" onClick={onClose} aria-label="Close">
           <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor">
             <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
           </svg>
         </button>
-
         <div className="checkout-modal-header">
           <div className="checkout-modal-icon">🛒</div>
           <h3 className="checkout-modal-title">Almost there!</h3>
-          <p className="checkout-modal-sub">
-            Fill in your details — we'll send a confirmation to your email
-            and message you on WhatsApp with payment info.
-          </p>
+          <p className="checkout-modal-sub">Fill in your details — we'll send a confirmation email and message you on WhatsApp with payment info.</p>
         </div>
-
-        {/* Order mini summary */}
         <div className="checkout-summary">
           {cartItems.map(i => (
             <div key={i.id} className="checkout-summary-row">
@@ -436,77 +529,30 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
             </div>
           ))}
           <div className="checkout-summary-total">
-            <span>Total</span>
-            <span>₦{total.toLocaleString()}</span>
+            <span>Total</span><span>₦{total.toLocaleString()}</span>
           </div>
         </div>
-
-        {/* Customer form */}
         <div className="checkout-form">
-          <div className="co-field">
-            <label>Your Name *</label>
-            <input
-              name="name"
-              value={form.name}
-              onChange={handle}
-              placeholder="e.g. Amaka Johnson"
-              autoFocus
-            />
-          </div>
-
-          <div className="co-field">
-            <label>Phone Number *</label>
-            <input
-              name="phone"
-              type="tel"
-              value={form.phone}
-              onChange={handle}
-              placeholder="e.g. 08012345678"
-            />
-          </div>
-
-          <div className="co-field">
-            <label>Email Address *</label>
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handle}
-              placeholder="e.g. amaka@gmail.com"
-            />
-          </div>
-
-          <div className="co-field">
-            <label>Delivery Address *</label>
-            <input
-              name="address"
-              value={form.address}
-              onChange={handle}
-              placeholder="e.g. 12 Musa Street, Wuse 2, Abuja"
-            />
-          </div>
-
-          <div className="co-field">
-            <label>Extra Notes (optional)</label>
-            <input
-              name="notes"
-              value={form.notes}
-              onChange={handle}
-              placeholder="e.g. Call when you arrive, gate is blue..."
-            />
-          </div>
+          {[
+            { name:'name',    label:'Your Name *',       type:'text',  placeholder:'e.g. Amaka Johnson'           },
+            { name:'phone',   label:'Phone Number *',    type:'tel',   placeholder:'e.g. 08012345678'             },
+            { name:'email',   label:'Email Address *',   type:'email', placeholder:'e.g. amaka@gmail.com'         },
+            { name:'address', label:'Delivery Address *',type:'text',  placeholder:'e.g. 12 Musa Street, Ile-Ife' },
+            { name:'notes',   label:'Extra Notes (optional)',type:'text',placeholder:'e.g. Call when you arrive'  },
+          ].map(f => (
+            <div key={f.name} className="co-field">
+              <label>{f.label}</label>
+              <input
+                name={f.name} type={f.type} value={form[f.name]}
+                onChange={handle} placeholder={f.placeholder}
+                autoFocus={f.name === 'name'}
+              />
+            </div>
+          ))}
         </div>
-
         {error && <p className="checkout-error">{error}</p>}
-
-        <button
-          className="checkout-submit-btn"
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="checkout-spinner" />
-          ) : (
+        <button className="checkout-submit-btn" onClick={handleSubmit} disabled={loading}>
+          {loading ? <span className="checkout-spinner" /> : (
             <>
               <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="currentColor">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
@@ -515,11 +561,7 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
             </>
           )}
         </button>
-
-        <p className="co-note">
-          A confirmation email will be sent automatically to your inbox.
-        </p>
-
+        <p className="co-note">A confirmation email will be sent automatically to your inbox.</p>
       </div>
     </div>
   )
@@ -540,7 +582,6 @@ function CartDrawer({ isOpen, onClose, cartItems, onRemove, onCheckout }) {
     <>
       <div className={`cart-backdrop ${isOpen ? 'open' : ''}`} onClick={onClose} aria-hidden="true" />
       <div className={`cart-drawer ${isOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Your cart">
-
         <div className="cart-drawer-header">
           <div className="cart-drawer-title-wrap">
             <h2 className="cart-drawer-title">Your Cart</h2>
@@ -554,7 +595,6 @@ function CartDrawer({ isOpen, onClose, cartItems, onRemove, onCheckout }) {
             </svg>
           </button>
         </div>
-
         <div className="cart-drawer-items">
           {cartItems.length === 0 ? (
             <div className="cart-drawer-empty">
@@ -569,7 +609,7 @@ function CartDrawer({ isOpen, onClose, cartItems, onRemove, onCheckout }) {
             cartItems.map(item => (
               <div key={item.id} className="cart-drawer-item">
                 <div className="cdi-img">
-                  <img src={item.img} alt={item.name} />
+                  <img src={item.images[0]} alt={item.name} />
                 </div>
                 <div className="cdi-info">
                   <p className="cdi-name">{item.name}</p>
@@ -587,7 +627,6 @@ function CartDrawer({ isOpen, onClose, cartItems, onRemove, onCheckout }) {
             ))
           )}
         </div>
-
         {cartItems.length > 0 && (
           <div className="cart-drawer-footer">
             <div className="cart-drawer-notice">
@@ -628,21 +667,16 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
   const [orderRef, setOrderRef]             = useState(null)
   const upsellShownRef                      = useRef(new Set())
 
-  // Sync cart to localStorage + parent navbar
   useEffect(() => {
     saveCart(cartItems)
     onAddToCart(cartItems)
   }, [cartItems])
 
-  // Open cart drawer when navbar cart icon is clicked
   useEffect(() => {
     const handler = () => setCartOpen(true)
     window.addEventListener('sweethub:openCart', handler)
     return () => window.removeEventListener('sweethub:openCart', handler)
   }, [])
-
-  // Show countdown when user returns from WhatsApp
-  // (handled in App.jsx via visibilitychange)
 
   const filtered = PRODUCTS.filter(p =>
     activeCategory === 'All' ? true : p.category === activeCategory
@@ -677,17 +711,14 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
       setMoqErrors(prev => ({ ...prev, [product.id]: true }))
       return
     }
-
     setCartItems(prev => {
       const existing = prev.find(i => i.id === product.id)
       if (existing) return prev.map(i => i.id === product.id ? { ...i, qty } : i)
       return [...prev, { ...product, qty }]
     })
-
     setAddedId(product.id)
     setTimeout(() => setAddedId(null), 1800)
 
-    // Upsell — show once per product
     if (!upsellShownRef.current.has(product.id)) {
       upsellShownRef.current.add(product.id)
       const pairId = product.pairWith?.find(pid =>
@@ -698,30 +729,27 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
         if (pairProduct) setTimeout(() => setUpsell({ product, pairProduct }), 400)
       }
     }
-
     setCartOpen(true)
   }
 
   const handleUpsellAdd = () => {
     if (!upsell) return
-    const p   = upsell.pairProduct
-    const qty = p.moq
-    setQuantities(prev => ({ ...prev, [p.id]: qty }))
+    const p = upsell.pairProduct
+    setQuantities(prev => ({ ...prev, [p.id]: p.moq }))
     setCartItems(prev => {
       if (prev.find(i => i.id === p.id)) return prev
-      return [...prev, { ...p, qty }]
+      return [...prev, { ...p, qty: p.moq }]
     })
     setUpsell(null)
   }
 
   const handleRemove = (id) => setCartItems(prev => prev.filter(i => i.id !== id))
 
-  // Called after Supabase save + WhatsApp open
   const handleOrderSuccess = (ref) => {
     setOrderRef(ref)
     setCheckoutOpen(false)
     setCartOpen(false)
-    setCartItems([])           // clear cart after order placed
+    setCartItems([])
     localStorage.removeItem(STORAGE_KEY)
   }
 
@@ -731,13 +759,12 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
   return (
     <>
       <section className="order-section" id="order" aria-label="Place your order">
-
         <div className="order-header">
           <p className="order-eyebrow">Fresh & Made to Order</p>
           <h2 className="order-heading">Build Your <em>Perfect Order</em></h2>
           <p className="order-sub">
             Set your quantity, add to cart, and order via WhatsApp.
-            Minimum quantities apply per item to keep things fresh.
+            Hover over any item to see more photos. Minimum quantities apply per item.
           </p>
         </div>
 
@@ -751,7 +778,6 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
               >{cat}</button>
             ))}
           </div>
-
           {cartItems.length > 0 && (
             <button className="cart-pill" onClick={() => setCartOpen(true)} aria-label="Open cart">
               <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor">
@@ -773,27 +799,30 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
 
             return (
               <div key={product.id} className={`product-card ${inCart ? 'in-cart' : ''}`}>
-                <div className="pc-img-wrap">
-                  <img src={product.img} alt={product.name} className="pc-img" />
-                  {inCart && <span className="pc-in-cart-badge">✓ In Cart</span>}
-                  {product.moq > 1 && <span className="pc-moq-badge">min {product.moq}</span>}
-                </div>
+
+                {/* ── Image cycler replaces old pc-img-wrap ── */}
+                <ProductImageCycler
+                  images={product.images}
+                  alt={product.name}
+                  inCart={inCart}
+                />
+
+                {/* MOQ badge — outside cycler so it doesn't conflict */}
+                {product.moq > 1 && (
+                  <span className="pc-moq-badge pc-moq-badge-outside">min {product.moq}</span>
+                )}
 
                 <div className="pc-body">
                   <div className="pc-top-row">
                     <p className="pc-name">{product.name}</p>
                     <p className="pc-price">{fmt(product.price)}<span className="pc-unit">/{product.unit}</span></p>
                   </div>
-
                   <div className="pc-qty-row">
                     <div className="order-qty">
                       <button className="qty-btn" onClick={() => decrement(product.id)} disabled={qty === 0} aria-label="Decrease">−</button>
                       <input
-                        type="number"
-                        className="qty-input"
-                        value={qty === 0 ? '' : qty}
-                        min={0}
-                        placeholder="0"
+                        type="number" className="qty-input"
+                        value={qty === 0 ? '' : qty} min={0} placeholder="0"
                         onChange={e => setQty(product.id, e.target.value)}
                       />
                       <button className="qty-btn" onClick={() => increment(product.id)} aria-label="Increase">+</button>
@@ -802,15 +831,10 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
                       {amount > 0 ? fmt(amount) : '₦—'}
                     </span>
                   </div>
-
                   {hasError && (
                     <p className="pc-moq-error" role="alert">⚠️ Min {product.moq} pieces required</p>
                   )}
-
-                  <button
-                    className={`pc-add-btn ${isAdded ? 'added' : ''}`}
-                    onClick={() => handleAddCard(product)}
-                  >
+                  <button className={`pc-add-btn ${isAdded ? 'added' : ''}`} onClick={() => handleAddCard(product)}>
                     {isAdded ? (
                       <><svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentColor"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg> Added!</>
                     ) : (
@@ -829,7 +853,6 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
           </svg>
           <p><strong>Notice Period:</strong> Please allow <strong>1hr 30min</strong> for fresh preparation.</p>
         </div>
-
       </section>
 
       <CustomOrderSection />
@@ -858,13 +881,6 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
           onSuccess={handleOrderSuccess}
         />
       )}
-
-      {showCountdown && (
-        <CountdownTimer
-          onClose={() => setShowCountdown(false)}
-          orderRef={orderRef || sessionStorage.getItem('sweethub_order_ref')}
-        />
-      )}
     </>
   )
 }
@@ -872,7 +888,7 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
 
 // ── Custom Order Section ──────────────────────────────────────
 function CustomOrderSection() {
-  const [form, setForm]       = useState({ name:'',phone:'',item:'',quantity:'',occasion:'',date:'',flavour:'',design:'',notes:'' })
+  const [form, setForm]           = useState({ name:'',phone:'',item:'',quantity:'',occasion:'',date:'',flavour:'',design:'',notes:'' })
   const [submitted, setSubmitted] = useState(false)
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
@@ -888,7 +904,9 @@ function CustomOrderSection() {
       `${form.design   ? `🎨 Design: ${form.design}\n` : ''}` +
       `${form.notes    ? `📝 Notes: ${form.notes}\n` : ''}` +
       `\nPlease send a quote. Thank you! 😊`
+    const customRef = 'CR-' + Date.now().toString().slice(-6)
     sessionStorage.setItem('sweethub_ordered', 'true')
+    sessionStorage.setItem('sweethub_order_ref', customRef)
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank')
     setSubmitted(true)
   }
@@ -919,7 +937,6 @@ function CustomOrderSection() {
             ))}
           </div>
         </div>
-
         <div className="custom-order-right">
           {submitted ? (
             <div className="custom-order-success">

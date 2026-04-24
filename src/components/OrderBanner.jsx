@@ -47,15 +47,17 @@ function OrderBanner() {
     }
   }, [visible])
 
-  const handleTrack = () => {
-    setVisible(false)
-    navigate(`/track-order?ref=${orderRef}`)
-  }
+const handleTrack = () => {
+  setVisible(false)
+  navigate(`/track-order?ref=${encodeURIComponent(orderRef)}`)
+  sessionStorage.removeItem('sweethub_order_ref')
+}
 
-  const handleDismiss = () => {
-    setVisible(false)
-    setDismissed(true)
-  }
+const handleDismiss = () => {
+  setVisible(false)
+  sessionStorage.removeItem('sweethub_order_ref')
+  setDismissed(true)
+}
 
   if (dismissed || !orderRef) return null
 

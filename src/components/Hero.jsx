@@ -10,10 +10,10 @@ import chin2 from '../assets/chin-chin/chin2.webp'
 import chin3 from '../assets/chin-chin/chin3.webp'
 import chin4 from '../assets/chin-chin/chin4.webp'
 
-import cookies1 from '../assets/cookies/cookies1.webp'
-import cookies2 from '../assets/cookies/cookies2.webp'
-import cookies3 from '../assets/cookies/cookies3.webp'
-import cookies4 from '../assets/cookies/cookies4.webp'
+import sausage1 from '../assets/sausage/sausage1.webp'
+import sausage2 from '../assets/sausage/sausage2.webp'
+import sausage3 from '../assets/sausage/sausage3.webp'
+import sausage4 from '../assets/sausage/sausage4.webp'
 
 import cake1 from '../assets/cakes/cake1.webp'
 import cake2 from '../assets/cakes/cake2.webp'
@@ -30,10 +30,10 @@ import banana_bread2 from '../assets/banana-breads/banana-bread2.webp'
 import banana_bread3 from '../assets/banana-breads/banana-bread3.webp'
 import banana_bread4 from '../assets/banana-breads/banana-bread4.webp'
 
-import shawarma1 from '../assets/shawarmas/shawarma1.webp'
-import shawarma2 from '../assets/shawarmas/shawarma2.webp'
-import shawarma3 from '../assets/shawarmas/shawarma3.webp'
-import shawarma4 from '../assets/shawarmas/shawarma4.webp'
+import fish_roll1 from '../assets/fish-roll/fish-roll1.webp'
+import fish_roll2 from '../assets/fish-roll/fish-roll2.webp'
+import fish_roll3 from '../assets/fish-roll/fish-roll3.webp'
+import fish_roll4 from '../assets/fish-roll/fish-roll4.webp'
 
 import pizza1 from '../assets/pizza/floating-slice-art-pizza.webp'
 import pizza2 from '../assets/pizza/pizza-with-mushrooms.webp'
@@ -45,6 +45,20 @@ import samosa2 from '../assets/samosa/samosa2.webp'
 import samosa3 from '../assets/samosa/samosa3.webp'
 import samosa4 from '../assets/samosa/samosa4.webp'
 
+import spring1 from '../assets/spring-rolls/spring-roll1.webp'
+import spring2 from '../assets/spring-rolls/spring-roll2.webp'
+import spring3 from '../assets/spring-rolls/spring-roll3.webp'
+import spring4 from '../assets/spring-rolls/spring-roll4.webp'
+
+import frank_roll1 from '../assets/frank-rolls/frank-roll1.webp'
+import frank_roll2 from '../assets/frank-rolls/frank-roll2.webp'
+import frank_roll3 from '../assets/frank-rolls/frank-roll3.webp'
+import frank_roll4 from '../assets/frank-rolls/frank-roll4.webp'
+
+import buns1 from '../assets/buns/buns1.webp'
+import buns2 from '../assets/buns/buns2.webp'
+import buns3 from '../assets/buns/buns3.webp'
+import buns4 from '../assets/buns/buns4.webp'
 
 const categories = [
   {
@@ -66,12 +80,12 @@ const categories = [
     ]
   },
   {
-    word: 'Cookies',
+    word: 'Sausage Roll',
     images: [
-      { img: cookies1, label: 'Choco Chip', rotate: '6deg',  size: { w: 200, h: 210 }, pos: { top: '0px',    right: '0px'  } },
-      { img: cookies3, label: 'Peanut Butter', rotate: '-5deg', size: { w: 170, h: 185 }, pos: { top: '10px',   left: '0px'   } },
-      { img: cookies4, label: 'Oatmeal Cookie', rotate: '3deg',  size: { w: 155, h: 165 }, pos: { bottom: '0px', right: '20px' } },
-      { img: cookies2, label: 'Shortbread', rotate: '-4deg', size: { w: 140, h: 150 }, pos: { bottom: '10px', left: '10px' } },
+      { img: sausage1, label: 'Spicy Bite', rotate: '6deg',  size: { w: 200, h: 210 }, pos: { top: '0px',    right: '0px'  } },
+      { img: sausage2, label: 'Savory Classic', rotate: '-5deg', size: { w: 170, h: 185 }, pos: { top: '10px',   left: '0px'   } },
+      { img: sausage3, label: 'Smoky Grill', rotate: '3deg',  size: { w: 155, h: 165 }, pos: { bottom: '0px', right: '20px' } },
+      { img: sausage4, label: 'Maple Glaze', rotate: '-4deg', size: { w: 140, h: 150 }, pos: { bottom: '10px', left: '10px' } },
     ]
   },
   {
@@ -102,12 +116,21 @@ const categories = [
     ]
   },
   {
-    word: 'Shawarma',
+    word: 'Fish Roll',
     images: [
-      { img: shawarma1, label: 'Chicken Shawarma', rotate: '6deg',  size: { w: 200, h: 210 }, pos: { top: '0px',    right: '0px'  } },
-      { img: shawarma2, label: 'Beef Shawarma',    rotate: '-5deg', size: { w: 170, h: 185 }, pos: { top: '10px',   left: '0px'   } },
-      { img: shawarma3, label: 'Mixed Shawarma',   rotate: '3deg',  size: { w: 155, h: 165 }, pos: { bottom: '0px', right: '20px' } },
-      { img: shawarma4, label: 'Veggie Shawarma',  rotate: '-4deg', size: { w: 140, h: 150 }, pos: { bottom: '10px', left: '10px' } },
+      { img: fish_roll1, label: 'Chicken Fish roll', rotate: '6deg',  size: { w: 200, h: 210 }, pos: { top: '0px',    right: '0px'  } },
+      { img: fish_roll2, label: 'Beef Fish roll',    rotate: '-5deg', size: { w: 170, h: 185 }, pos: { top: '10px',   left: '0px'   } },
+      { img: fish_roll3, label: 'Mixed Fish roll',   rotate: '3deg',  size: { w: 155, h: 165 }, pos: { bottom: '0px', right: '20px' } },
+      { img: fish_roll4, label: 'Veggie Fish roll',  rotate: '-4deg', size: { w: 140, h: 150 }, pos: { bottom: '10px', left: '10px' } },
+    ]
+  },
+  {
+    word: 'Frank Roll',
+    images: [
+      { img: frank_roll1, label: 'Chicken Frank roll', rotate: '6deg',  size: { w: 200, h: 210 }, pos: { top: '0px',    right: '0px'  } },
+      { img: frank_roll2, label: 'Beef Frank roll',    rotate: '-5deg', size: { w: 170, h: 185 }, pos: { top: '10px',   left: '0px'   } },
+      { img: frank_roll3, label: 'Mixed Frank roll',   rotate: '3deg',  size: { w: 155, h: 165 }, pos: { bottom: '0px', right: '20px' } },
+      { img: frank_roll4, label: 'Veggie Frank roll',  rotate: '-4deg', size: { w: 140, h: 150 }, pos: { bottom: '10px', left: '10px' } },
     ]
   },
   {
@@ -126,6 +149,24 @@ const categories = [
       { img: samosa2, label: 'Chicken Samosa', rotate: '-5deg', size: { w: 170, h: 185 }, pos: { top: '10px',   left: '0px'   } },
       { img: samosa3, label: 'Veggie Samosa', rotate: '3deg',  size: { w: 155, h: 165 }, pos: { bottom: '0px', right: '20px' } },
       { img: samosa4, label: 'Spicy Samosa', rotate: '-4deg', size: { w: 140, h: 150 }, pos: { bottom: '10px', left: '10px' } },
+    ]
+  },
+  {
+    word: 'Spring Roll',
+    images: [
+      { img: spring1, label: 'Beef Spring', rotate: '6deg',  size: { w: 200, h: 210 }, pos: { top: '0px',    right: '0px'  } },
+      { img: spring2, label: 'Chicken Spring', rotate: '-5deg', size: { w: 170, h: 185 }, pos: { top: '10px',   left: '0px'   } },
+      { img: spring3, label: 'Veggie Spring', rotate: '3deg',  size: { w: 155, h: 165 }, pos: { bottom: '0px', right: '20px' } },
+      { img: spring4, label: 'Spicy Spring', rotate: '-4deg', size: { w: 140, h: 150 }, pos: { bottom: '10px', left: '10px' } },
+    ]
+  },
+  {
+    word: 'Buns',
+    images: [
+      { img: buns1, label: 'Fresh Buns', rotate: '6deg',  size: { w: 200, h: 210 }, pos: { top: '0px',    right: '0px'  } },
+      { img: buns2, label: 'Sweet Buns', rotate: '-5deg', size: { w: 170, h: 185 }, pos: { top: '10px',   left: '0px'   } },
+      { img: buns3, label: 'Hot Buns', rotate: '3deg',  size: { w: 155, h: 165 }, pos: { bottom: '0px', right: '20px' } },
+      { img: buns4, label: 'Flavor Buns', rotate: '-4deg', size: { w: 140, h: 150 }, pos: { bottom: '10px', left: '10px' } },
     ]
   },
 ]
