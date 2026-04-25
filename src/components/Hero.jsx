@@ -227,8 +227,8 @@ function Hero() {
           </div>
 
           <div className="hero-btns">
-            <button className="hero-btn-primary">Shop Now</button>
-            <button className="hero-btn-secondary">View Menu</button>
+            <a href='#order' className="hero-btn-primary">Shop Now</a>
+            <a href='#order' className="hero-btn-secondary">View Menu</a>
           </div>
 
           <div className="hero-dots" role="tablist">

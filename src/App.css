@@ -732,7 +732,7 @@
 .hero-btn-primary {
   background: var(--accent);
   color: #fff;
-  border: none;
+  text-decoration: none;
   padding: 13px 28px;
   border-radius: var(--radius);
   font-size: 15px;
@@ -757,6 +757,7 @@
   background: transparent;
   color: var(--accent);
   border: 1.5px solid var(--accent);
+  text-decoration: none;
   padding: 13px 28px;
   border-radius: var(--radius);
   font-size: 15px;
@@ -1444,54 +1445,48 @@
 }
 
 /* ══════════════════════════════
-   MARQUEE STRIP (CLEAN & PREMIUM LIGHT)
+   MARQUEE STRIP (PREMIUM TYPOGRAPHIC STYLE)
    ══════════════════════════════ */
 
 .marquee-section {
-  /* Changed from a heavy accent to a clean, crisp background */
-  background: rgba(255, 255, 255, 0.2); 
-  backdrop-filter: blur(10px);
-  padding: 24px 0; 
+  background: transparent; 
+  padding: 50px 0; /* More breathing room for the large text */
   overflow: hidden;
   position: relative;
-  /* Very subtle, brand-tinted borders top and bottom */
-  border-top: 1px solid rgba(192, 57, 43, 0.08);
-  border-bottom: 1px solid rgba(192, 57, 43, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 16px; 
+  gap: 24px; /* Space between the two rows */
 }
 
-/* Fade edges left and right to match the light background */
+/* ── Edge Fades (Blends perfectly into your cream background) ── */
 .marquee-section::before,
 .marquee-section::after {
   content: '';
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 100px; /* Made the fade slightly wider for a smoother blend */
+  width: 15vw; /* Wider fade for a smoother look */
   z-index: 2;
   pointer-events: none;
 }
 
 .marquee-section::before {
   left: 0;
-  /* Fades to transparent from white */
-  background: linear-gradient(to right, #ffffff, transparent);
+  background: linear-gradient(to right, var(--bg, #fffaf1), transparent);
 }
 
 .marquee-section::after {
   right: 0;
-  /* Fades to transparent from white */
-  background: linear-gradient(to left, #ffffff, transparent);
+  background: linear-gradient(to left, var(--bg, #fffaf1), transparent);
 }
 
+/* ── Scrolling Animation ── */
 .marquee-track {
   display: flex;
   align-items: center;
   gap: 0;
   width: max-content;
-  animation: marqueeScroll 40s linear infinite;
+  animation: marqueeScroll 35s linear infinite;
 }
 
 .marquee-track:hover {
@@ -1507,29 +1502,70 @@
   to   { transform: translateX(-50%); }
 }
 
+/* ── Typography & Items ── */
 .marquee-item {
   display: inline-flex;
   align-items: center;
-  gap: 12px; /* A little more breathing room between words */
-  padding: 0 24px;
-  font-size: 14px;
-  font-weight: 700; /* Bolder text looks more premium on light backgrounds */
-  color: var(--text, #1a1a1a); /* Dark text for high readability */
-  letter-spacing: 0.05em;
-  white-space: nowrap;
+  gap: 40px; /* Big gap between text and the star */
+  padding: 0 20px;
+}
+
+.marquee-text {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.5rem; /* Huge, premium size! */
+  font-weight: 900;
+  font-style: italic;
   text-transform: uppercase;
+  letter-spacing: -1px;
+  white-space: nowrap;
+  opacity: 0.7;
 }
 
-.marquee-emoji {
-  font-size: 18px; /* Slightly larger emojis */
+/* Solid Text */
+.marquee-text.solid {
+  color: var(--text, #1a1a1a);
 }
 
-.marquee-divider {
-  /* Using your brand's accent color just for the little stars! */
-  color: var(--accent); 
-  font-size: 12px;
-  margin-left: 20px;
-  opacity: 0.8;
+/* 🚨 The Premium Hollow/Outline Effect 🚨 */
+.marquee-text.outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--text, #1a1a1a);
+}
+
+/* ── The SVG Star Separator ── */
+.marquee-star {
+  color: var(--accent, #c0392b); /* Matches your brand red */
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  animation: starSpin 10s linear infinite; /* Slow, elegant spin */
+}
+
+@keyframes starSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Mobile Adjustments ── */
+@media (max-width: 768px) {
+  .marquee-section {
+    padding: 30px 0;
+    gap: 16px;
+  }
+  
+  .marquee-item {
+    gap: 24px;
+  }
+
+  .marquee-star {
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Outline needs to be slightly thinner on mobile */
+  .marquee-text.outline {
+    -webkit-text-stroke: 1px var(--text, #1a1a1a);
+  }
 }
 
 
@@ -1937,6 +1973,7 @@
   color: var(--text);
   outline: none;
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .qty-input::-webkit-outer-spin-button,
@@ -8221,6 +8258,142 @@
     height: 32px; 
     margin: 4px 0 4px 22px; 
   }
+}
+
+/* ══════════════════════════════
+   SCROLL-LINKED VIDEO FRYER ANIMATION
+   ══════════════════════════════ */
+
+.fryer-wrapper {
+  height: 300vh; /* Forces a long scroll */
+  background: #110704; /* Very dark espresso background to match the oil */
+  position: relative;
+  z-index: 10;
+}
+
+.fryer-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── Floating Text ── */
+.fryer-text-wrap {
+  position: absolute;
+  top: 15vh;
+  text-align: center;
+  z-index: 30;
+}
+
+.fryer-eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffb84d;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 12px;
+}
+
+.fryer-title {
+  font-family: var(--font-heading, inherit);
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 800;
+  color: white;
+  margin: 0 0 8px;
+  letter-spacing: -1px;
+}
+
+.fryer-title em { color: var(--accent); font-style: italic; }
+.fryer-sub { font-size: 16px; color: rgba(255,255,255,0.7); }
+
+/* ── 1. The Fixed Oil Background ── */
+.oil-background-container {
+  position: absolute;
+  bottom: -5vh; /* Push it down slightly */
+  width: 100%;
+  max-width: 800px;
+  height: 70vh;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.oil-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures it fills the space perfectly */
+  /* This fades the top edges of the oil video into the dark background */
+  -webkit-mask-image: radial-gradient(circle at 50% 100%, black 40%, transparent 80%);
+  mask-image: radial-gradient(circle at 50% 100%, black 40%, transparent 80%);
+}
+
+/* ── 2. The Magic Mask Zone ── */
+.snack-magic-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  
+  /* 🚨 IMPORTANT TWEAK 🚨 */
+  /* Change this depending on where the oil surface is in your video! */
+  height: 70%; 
+  
+  overflow: hidden; /* Hides snacks when they pass the 70% line! */
+  z-index: 20;
+}
+
+/* ── 3. The Falling Snacks ── */
+.falling-snack-wrapper {
+  position: absolute;
+  width: 250px; /* Size of the snack video box */
+  height: 250px;
+}
+
+.snack-left { left: 15%; }
+.snack-right { right: 15%; width: 300px; height: 300px; }
+
+.snack-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 🚨 THE MAGIC BLEND TRICK 🚨 */
+/* If your AI snack video has a BLACK background, use this: */
+.blend-screen {
+  mix-blend-mode: screen; 
+  /* Screen mode makes black 100% invisible, leaving only the bright snacks! */
+}
+
+/* If your AI snack video has a WHITE background, use this instead: */
+.blend-multiply {
+  mix-blend-mode: multiply;
+  /* Multiply mode makes white 100% invisible! */
+}
+
+/* Smooth fade out at the bottom of the section */
+.fryer-bottom-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 15vh;
+  background: linear-gradient(to top, var(--bg), transparent);
+  z-index: 40;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .oil-background-container { height: 50vh; }
+  .falling-snack-wrapper { width: 150px; height: 150px; }
+  .snack-right { width: 180px; height: 180px; }
+  .snack-magic-mask { height: 60%; } /* Usually need a higher cutoff on mobile */
 }
 
 /* ==========================================================================

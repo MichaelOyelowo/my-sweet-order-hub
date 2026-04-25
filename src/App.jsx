@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import NavbarMobile from './components/NavbarMobile'
 import Hero from './components/Hero'
+import FryerAnimation from './components/FryerAnimation';
 import ChatStory from './components/ChatStory'
 import Marquee from './components/Marquee'
 import Gallery from './components/Gallery.jsx'
@@ -51,6 +52,7 @@ function MainSite({
         onLogout={onLogout}
       />
       <Hero />
+      <FryerAnimation />
       <ChatStory />
       <Marquee />
       <OrderSection
