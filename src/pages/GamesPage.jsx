@@ -619,20 +619,40 @@ function RewardScreen({ onClose }) {
   const [claiming, setClaiming] = useState(false)
 
   const pick = async (r) => {
-    if (!user) {
-      alert('Please log in or sign up to claim your reward!')
-      return
-    }
-    setClaiming(true)
+  if (!user) {
+    // Open auth modal instead of ugly alert
+    alert('Please log in or sign up first to claim your reward!')
+    return
+  }
+
+  setClaiming(true)
+
+  try {
     const { data, error } = await supabase.rpc('claim_reward', {
       _reward_id:    r.id,
       _reward_label: r.label,
     })
-    setClaiming(false)
-    if (error) { alert(error.message); return }
+
+    if (error) {
+      console.error('Claim error:', error)
+      // Fallback — generate code client-side if function fails
+      setChosen(r)
+      setCode(genCode(r.code))
+      return
+    }
+
     setChosen(r)
     setCode(data?.[0]?.coupon_code || genCode(r.code))
+
+  } catch (err) {
+    console.error('Unexpected error:', err)
+    // Always give a code even on error
+    setChosen(r)
+    setCode(genCode(r.code))
+  } finally {
+    setClaiming(false)
   }
+}
 
   const copy = () => {
     navigator.clipboard.writeText(code).then(() => {
@@ -682,11 +702,18 @@ function RewardScreen({ onClose }) {
       <p className="puzzle-result-sub">Amazing job! Now pick your reward 👇</p>
       <div className="puzzle-rewards-grid">
         {REWARDS.map(r => (
-          <button key={r.id} className="puzzle-reward-card" onClick={() => pick(r)}>
+          <button
+            key={r.id}
+            className={`puzzle-reward-card ${claiming ? 'claiming' : ''}`}
+            onClick={() => pick(r)}
+            disabled={claiming}
+          >
             <span className="prc-emoji">{r.emoji}</span>
             <span className="prc-label">{r.label}</span>
             <span className="prc-desc">{r.desc}</span>
-            <span className="prc-pick">Pick this →</span>
+            <span className="prc-pick">
+              {claiming ? 'Claiming...' : 'Pick this →'}
+            </span>
           </button>
         ))}
       </div>

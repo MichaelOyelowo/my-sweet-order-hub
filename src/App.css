@@ -4092,6 +4092,7 @@
   letter-spacing: 0.1em;
 }
 
+
 /* ── 5. Reward / Game Over Screens ── */
 .puzzle-result { position: relative; overflow: hidden; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .puzzle-result-emoji { font-size: 72px; line-height: 1; margin-bottom: 16px; animation: resBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15)); }
@@ -4107,7 +4108,11 @@
 .prc-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
 .prc-pick { font-size: 12px; font-weight: 800; color: var(--accent); margin-top: 4px; opacity: 0; transform: translateY(5px); transition: all 0.3s; }
 .puzzle-reward-card:hover .prc-pick { opacity: 1; transform: translateY(0); }
-
+.puzzle-reward-card.claiming {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
 .puzzle-lost-btns { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; max-width: 300px; margin: 0 auto; }
 .puzzle-retry-btn { width: 100%; padding: 14px; border-radius: 14px; border: none; background: var(--accent); color: white; font-size: 15px; font-weight: 800; cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 20px rgba(192, 57, 43, 0.3); }
 .puzzle-retry-btn:hover { background: var(--accent-h); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(192, 57, 43, 0.4); }
