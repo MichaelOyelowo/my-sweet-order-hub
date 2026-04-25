@@ -10,9 +10,9 @@ function Navbar({ cartCount, user, displayName, avatar, onLogin, onSignup, onLog
   const links = [
     { label: 'Home',        path: '/'           },
     { label: 'Shop',        path: '/#order'     },
-    { label: 'Games',       path: '/games'      },
     { label: 'About',       path: '/about'      },
     { label: 'Contact',     path: '/contact'    },
+    { label: 'Games',       path: '/games'      },
     { label: 'Track Order', path: '/track-order'},
   ]
 

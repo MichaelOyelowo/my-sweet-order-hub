@@ -611,6 +611,75 @@ function CatchSnacks({ onWin }) {
 }
 
 // ── REWARD SCREEN ─────────────────────────────────────────────
+const COOLDOWN_DAYS = 7
+const COOLDOWN_MS   = COOLDOWN_DAYS * 24 * 60 * 60 * 1000
+
+function formatCountdown(ms) {
+  if (ms <= 0) return '0d 00h 00m 00s'
+  const totalSec = Math.floor(ms / 1000)
+  const days  = Math.floor(totalSec / 86400)
+  const hours = Math.floor((totalSec % 86400) / 3600)
+  const mins  = Math.floor((totalSec % 3600) / 60)
+  const secs  = totalSec % 60
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${days}d ${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
+}
+
+function splitCountdown(ms) {
+  const safe = Math.max(0, ms)
+  const totalSec = Math.floor(safe / 1000)
+  const pad = (n) => String(n).padStart(2, '0')
+  return {
+    days:  String(Math.floor(totalSec / 86400)),
+    hours: pad(Math.floor((totalSec % 86400) / 3600)),
+    mins:  pad(Math.floor((totalSec % 3600) / 60)),
+    secs:  pad(totalSec % 60),
+  }
+}
+
+const COOLDOWN_STYLES = `
+.cooldown-screen{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 20px;text-align:center;color:#fff;
+  background:radial-gradient(circle at 50% 0%, rgba(255,107,157,0.25), transparent 60%),
+             linear-gradient(160deg,#1a1033 0%,#2a1654 60%,#1a1033 100%);
+  border-radius:24px;min-height:520px;position:relative;overflow:hidden;
+}
+.cooldown-screen::before{
+  content:"";position:absolute;inset:-2px;border-radius:24px;padding:2px;
+  background:linear-gradient(135deg,#ff6b9d,#a855f7,#06b6d4);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.7;
+}
+.cooldown-emoji{font-size:64px;margin-bottom:12px;animation:cooldown-bounce 2.4s ease-in-out infinite;}
+@keyframes cooldown-bounce{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-10px) rotate(5deg);}}
+.cooldown-title{font-size:28px;font-weight:800;margin:0 0 8px;
+  background:linear-gradient(90deg,#ff6b9d,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.cooldown-sub{font-size:15px;line-height:1.5;color:rgba(255,255,255,.75);max-width:340px;margin:0 0 24px;}
+.cooldown-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.55);margin-bottom:14px;}
+.cooldown-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;max-width:340px;margin-bottom:8px;}
+.cooldown-cell{
+  background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:14px 6px 10px;
+  box-shadow:0 8px 24px -12px rgba(168,85,247,.6),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.cooldown-num{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;
+  color:#fff;text-shadow:0 0 18px rgba(255,107,157,.55);}
+.cooldown-unit{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.6);margin-top:6px;}
+.cooldown-cell.pulse .cooldown-num{animation:cooldown-pulse 1s ease-in-out infinite;}
+@keyframes cooldown-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.65;transform:scale(.95);}}
+.cooldown-ready{font-size:12px;color:rgba(255,255,255,.6);margin:18px 0 24px;}
+.cooldown-back{
+  background:linear-gradient(135deg,#ff6b9d,#a855f7);color:#fff;border:none;
+  padding:12px 28px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;
+  box-shadow:0 10px 30px -10px rgba(168,85,247,.8);transition:transform .15s ease;
+}
+.cooldown-back:hover{transform:translateY(-2px);}
+`
+
+
 function RewardScreen({ onClose }) {
   const { user } = useAuth()                    // ✅ hook inside component
   const [chosen, setChosen] = useState(null)
@@ -618,12 +687,59 @@ function RewardScreen({ onClose }) {
   const [copied, setCopied] = useState(false)
   const [claiming, setClaiming] = useState(false)
 
+  // Cooldown state
+  const [checking, setChecking]   = useState(true)
+  const [lastClaim, setLastClaim] = useState(null) // Date | null
+  const [now, setNow]             = useState(() => Date.now())
+
+  // 1) On mount: look up the user's most recent claim
+  useEffect(() => {
+    let cancelled = false
+    const check = async () => {
+      if (!user) { setChecking(false); return }
+      try {
+        const { data, error } = await supabase
+          .from('reward_claims')
+          .select('claimed_at')
+          .eq('user_id', user.id)
+          .order('claimed_at', { ascending: false })
+          .limit(1)
+        if (cancelled) return
+        if (error) {
+          console.error('Cooldown check error:', error)
+        } else if (data && data.length > 0 && data[0].claimed_at) {
+          setLastClaim(new Date(data[0].claimed_at))
+        }
+      } catch (err) {
+        console.error('Cooldown check failed:', err)
+      } finally {
+        if (!cancelled) setChecking(false)
+      }
+    }
+    check()
+    return () => { cancelled = true }
+  }, [user])
+
+  // 2) Tick every second while we're in cooldown
+  const cooldownEndsAt = lastClaim ? lastClaim.getTime() + COOLDOWN_MS : 0
+  const msLeft         = cooldownEndsAt - now
+  const inCooldown     = lastClaim && msLeft > 0
+
+  useEffect(() => {
+    if (!inCooldown) return
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [inCooldown])
+
   const pick = async (r) => {
   if (!user) {
     // Open auth modal instead of ugly alert
     alert('Please log in or sign up first to claim your reward!')
     return
   }
+
+  // Hard guard: never allow claiming during cooldown
+  if (inCooldown) return
 
   setClaiming(true)
 
@@ -638,17 +754,24 @@ function RewardScreen({ onClose }) {
       // Fallback — generate code client-side if function fails
       setChosen(r)
       setCode(genCode(r.code))
+      setLastClaim(new Date())
+      setNow(Date.now())
       return
     }
 
     setChosen(r)
     setCode(data?.[0]?.coupon_code || genCode(r.code))
+    // Start the 7-day cooldown immediately on the client
+    setLastClaim(new Date())
+    setNow(Date.now())
 
   } catch (err) {
     console.error('Unexpected error:', err)
     // Always give a code even on error
     setChosen(r)
     setCode(genCode(r.code))
+    setLastClaim(new Date())
+    setNow(Date.now())
   } finally {
     setClaiming(false)
   }
@@ -689,6 +812,61 @@ function RewardScreen({ onClose }) {
       <button className="puzzle-skip" onClick={onClose}>I'll order later</button>
     </div>
   )
+
+  // While we look up the user's last claim, show a tiny loader
+  if (user && checking) return (
+    <div className="puzzle-screen puzzle-result won">
+      <div className="puzzle-result-emoji">⏳</div>
+      <h2 className="puzzle-result-title">Checking your rewards…</h2>
+      <p className="puzzle-result-sub">One sec while we load your status.</p>
+    </div>
+  )
+
+  // 7-day cooldown screen — user already claimed within the last week
+  if (inCooldown) {
+    const readyDate = new Date(cooldownEndsAt)
+    const dateStr = readyDate.toLocaleString(undefined, {
+      weekday: 'long', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    })
+    const t = splitCountdown(msLeft)
+    return (
+      <>
+        <style>{COOLDOWN_STYLES}</style>
+        <div className="cooldown-screen">
+          <div className="cooldown-emoji">🎮</div>
+          <h2 className="cooldown-title">Keep having fun! 😜</h2>
+          <p className="cooldown-sub">
+            You already claimed a reward this week. Play as much as you like —
+            come back to claim another reward in:
+          </p>
+
+          <div className="cooldown-label">Next reward unlocks in</div>
+          <div className="cooldown-grid">
+            <div className="cooldown-cell">
+              <div className="cooldown-num">{t.days}</div>
+              <div className="cooldown-unit">Days</div>
+            </div>
+            <div className="cooldown-cell">
+              <div className="cooldown-num">{t.hours}</div>
+              <div className="cooldown-unit">Hours</div>
+            </div>
+            <div className="cooldown-cell">
+              <div className="cooldown-num">{t.mins}</div>
+              <div className="cooldown-unit">Mins</div>
+            </div>
+            <div className="cooldown-cell pulse">
+              <div className="cooldown-num">{t.secs}</div>
+              <div className="cooldown-unit">Secs</div>
+            </div>
+          </div>
+
+          <div className="cooldown-ready">🗓 Available on {dateStr}</div>
+          <button className="cooldown-back" onClick={onClose}>Back to games →</button>
+        </div>
+      </>
+    )
+  }
 
   return (
     <div className="puzzle-screen puzzle-result won">
