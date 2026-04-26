@@ -1,86 +1,93 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import {
+  MapPin,
+  ArrowUpRight,
+  Sparkles,
+  Clock,
+  Leaf,
+  HeartHandshake,
+  Quote,
+  ChevronRight,
+} from 'lucide-react'
 import Footer from '../components/Footer'
+import michael from '../assets/team/michael.webp'
 
 // ── Team data ─────────────────────────────────────────────────
-// Replace img src with real photos when ready
-// import joy    from '../assets/team/joy.webp'
+// When ready, import real photos and assign to `img`
+// import joy from '../assets/team/joy.webp'
 // import michael from '../assets/team/michael.webp'
-// import janet  from '../assets/team/janet.webp'
+// import janet from '../assets/team/janet.webp'
 
 const TEAM = [
   {
     name: 'Joy Yaya',
-    role: 'Head Chef, Founder & Baker',
-    img: null, // replace with: joy
-    color: '#c0392b',
-    accent: 'rgba(192,57,43,0.08)',
+    role: 'Founder & Head Pastry Chef',
+    img: null,
+    initials: 'JY',
     story: [
-      "Joy didn't just learn to bake — she was born with flour in her hands. From a young age, she discovered something most people take years to find: the power of food to make a person feel genuinely seen and cared for.",
-      "What sets Joy apart isn't just skill — it's the way she thinks about baking differently. Every item that leaves her kitchen is crafted to surprise you. To make you pause, take another bite, and wonder how something can taste this good.",
-      "She's been baking for years, and not one of those years was wasted. Every recipe refined, every technique mastered, every customer amazed — that's Joy's legacy, baked into every single order.",
+      "Joy founded SweetHUB on a single conviction: that pastry, when made with discipline and intention, becomes a form of hospitality.",
+      "Trained through years of self-directed practice and refined by an exacting standard for ingredients and technique, she leads our kitchen and oversees every recipe that bears the SweetHUB name.",
+      "Her work is governed by a simple principle — consistency is non-negotiable, and quality is never delegated.",
     ],
-    quote: "I don't just bake snacks. I bake moments people remember.",
-    tags: ['Head Baker', 'Founder', 'Recipe Developer', 'Quality Control'],
+    quote: 'We do not bake to impress. We bake to be trusted.',
+    expertise: ['Recipe Development', 'Quality Standards', 'Pastry Direction', 'Kitchen Leadership'],
   },
   {
     name: 'Michael Oyelowo',
-    role: 'Chief Architect & Growth Strategist',
-    img: null, // replace with: michael
-    color: '#e67e22',
-    accent: 'rgba(230,126,34,0.08)',
+    role: 'Co-Founder & Managing Director',
+    img: michael,
+    initials: 'MO',
     story: [
-      "Michael graduated from Obafemi Awolowo University in 2024 with one mission: to solve a problem that bothered him every single day. People in Ile-Ife waking up, craving something delicious and fresh, with nowhere to turn.",
-      "He looked at what Joy was already doing — incredible baking, loyal customers — and saw something she couldn't yet see herself. A brand. A platform. A business that could bring those snacks directly to anyone who needed them, anytime they needed them.",
-      "Michael isn't the one in the kitchen. He's the one who built everything around it. The website, the strategy, the systems, the vision. He turned a local passion into a proper brand — and he's just getting started.",
+      "Michael leads strategy, brand, and growth at SweetHUB. A 2024 graduate of Obafemi Awolowo University, he established the company to bring structured, reliable pastry delivery to a market that had long lacked it.",
+      "He oversees the company's operations, technology, and customer experience — building the systems that allow craftsmanship to scale without compromise.",
+      "His role is to ensure that every part of the business outside the kitchen meets the same standard as the work inside it.",
     ],
-    quote: "Joy had the magic. I just made sure the world could find it.",
-    tags: ['Brand Strategy', 'Digital Growth', 'Systems Builder', 'OAU Graduate 2024'],
+    quote: 'Craft creates the product. Systems create the company.',
+    expertise: ['Brand Strategy', 'Operations', 'Technology', 'Business Development'],
   },
   {
     name: 'Janet Yaya',
     role: 'Head of Operations & Supply',
-    img: null, // replace with: janet
-    color: '#8e44ad',
-    accent: 'rgba(142,68,173,0.08)',
+    img: null,
+    initials: 'JY',
     story: [
-      "Every great kitchen runs on what's inside it — and Janet makes sure SweetHUB never runs short. From sourcing the freshest ingredients to making sure the right materials are always in stock, Janet is the quiet force behind every order that goes out.",
-      "But her role goes beyond logistics. Janet is the emotional anchor of the SweetHUB team. On the days when things get hard — and every business has those days — she's the one keeping spirits up, keeping the team grounded, and reminding everyone why they started.",
-      "She doesn't need a fancy title to describe what she does. She just shows up, every single day, and makes everything work. That's the kind of person every business prays for.",
+      "Janet leads procurement, inventory, and daily operations. She is responsible for ensuring that every ingredient meets our specification and that the kitchen never operates below capacity.",
+      "Her work spans supplier relationships, quality auditing, and the operational rhythm that allows the team to deliver consistently, day after day.",
+      "She is the operational backbone of SweetHUB — quiet, methodical, and indispensable.",
     ],
-    quote: "If Joy bakes the heart of SweetHUB, I make sure it keeps beating.",
-    tags: ['Procurement', 'Supply Chain', 'Team Morale', 'Operations'],
+    quote: 'Excellence in the final product begins with discipline in the supply chain.',
+    expertise: ['Procurement', 'Supply Chain', 'Quality Auditing', 'Daily Operations'],
   },
 ]
 
 const MILESTONES = [
-  { year: '2024', event: 'Michael graduates from OAU', icon: '🎓' },
-  { year: '2024', event: 'SweetHUB concept born in Ile-Ife', icon: '💡' },
-  { year: '2024', event: 'First orders delivered fresh to doors', icon: '🛵' },
-  { year: '2025', event: '2,400+ happy customers and counting', icon: '❤️' },
-  { year: '2025', event: 'SweetHUB.ng launches online', icon: '🌐' },
+  { year: '2024', event: 'SweetHUB founded in Ile-Ife, Osun State.' },
+  { year: '2024', event: 'First commercial deliveries launched.' },
+  { year: '2025', event: 'Online ordering platform released at sweethub.ng.' },
+  { year: '2025', event: 'Crossed 2,400 served customers and 5,000 fulfilled orders.' },
 ]
 
 const VALUES = [
   {
-    icon: '🍰',
-    title: 'Freshness above all',
-    desc: 'Every order starts from scratch. No frozen stock. No shortcuts. Ever.',
+    Icon: Leaf,
+    title: 'Made fresh, never stocked.',
+    desc: 'Every order is prepared on the day. We hold no frozen inventory and offer no exceptions to this rule.',
   },
   {
-    icon: '🤝',
-    title: 'No pressure, just love',
-    desc: "If we don't wow you, you never have to order again. But we're confident you'll be back.",
+    Icon: Sparkles,
+    title: 'Quality is a standard, not a claim.',
+    desc: 'Ingredients, technique, and presentation are governed by internal specifications that do not change with demand.',
   },
   {
-    icon: '⚡',
-    title: 'Speed without compromise',
-    desc: '30 minutes to your door. Fresh, hot, and exactly as you ordered.',
+    Icon: Clock,
+    title: 'Reliability is the product.',
+    desc: 'A 30-minute delivery window, met consistently, is more valuable than a faster window met occasionally.',
   },
   {
-    icon: '🎨',
-    title: 'Different by design',
-    desc: "Joy doesn't bake the same way twice. We exist to surprise you, every single time.",
+    Icon: HeartHandshake,
+    title: 'The customer relationship is long-term.',
+    desc: 'We build for repeat customers, not single transactions. Every interaction is treated accordingly.',
   },
 ]
 
@@ -93,7 +100,7 @@ function useCountUp(target, started, duration = 2000) {
     const step = (ts) => {
       if (!startTime) startTime = ts
       const progress = Math.min((ts - startTime) / duration, 1)
-      const eased    = 1 - Math.pow(1 - progress, 3)
+      const eased = 1 - Math.pow(1 - progress, 3)
       setCount(Math.floor(eased * target))
       if (progress < 1) requestAnimationFrame(step)
     }
@@ -116,34 +123,33 @@ function Stats() {
   }, [])
 
   const customers = useCountUp(2400, started, 2200)
-  const orders    = useCountUp(5000, started, 2500)
-  const mins      = useCountUp(30,   started, 1200)
-  const years     = useCountUp(3,    started, 1000)
+  const orders = useCountUp(5000, started, 2500)
+  const mins = useCountUp(30, started, 1200)
+  const years = useCountUp(3, started, 1000)
+
+  const items = [
+    { value: `${customers.toLocaleString()}+`, label: 'Customers Served' },
+    { value: `${orders.toLocaleString()}+`, label: 'Orders Fulfilled' },
+    { value: `${mins} min`, label: 'Average Delivery' },
+    { value: `${years}+ yrs`, label: 'Operating Experience' },
+  ]
 
   return (
-    <div className="about-stats" ref={ref}>
-      <div className="about-stat">
-        <span className="about-stat-num">{customers.toLocaleString()}+</span>
-        <span className="about-stat-label">Happy Customers</span>
+    <section ref={ref} className="about-stats">
+      <div className="about-stats-inner">
+        {items.map((it, i) => (
+          <div className="about-stat" key={i}>
+            <div className="about-stat-num">{it.value}</div>
+            <div className="about-stat-label">{it.label}</div>
+          </div>
+        ))}
       </div>
-      <div className="about-stat">
-        <span className="about-stat-num">{orders.toLocaleString()}+</span>
-        <span className="about-stat-label">Orders Delivered</span>
-      </div>
-      <div className="about-stat">
-        <span className="about-stat-num">{mins}</span>
-        <span className="about-stat-label">Min Avg Delivery</span>
-      </div>
-      <div className="about-stat">
-        <span className="about-stat-num">{years}+</span>
-        <span className="about-stat-label">Years of Baking</span>
-      </div>
-    </div>
+    </section>
   )
 }
 
 // ── Team card ─────────────────────────────────────────────────
-function TeamCard({ member, index }) {
+function TeamCard({ member }) {
   const [visible, setVisible] = useState(false)
   const ref = useRef(null)
 
@@ -157,224 +163,202 @@ function TeamCard({ member, index }) {
   }, [])
 
   return (
-    <div
-      ref={ref}
-      className={`team-card ${visible ? 'visible' : ''}`}
-      style={{ transitionDelay: `${index * 150}ms` }}
-    >
-      {/* Photo */}
-      <div className="team-photo-wrap" style={{ background: member.accent }}>
+    <article ref={ref} className={`team-card ${visible ? 'visible' : ''}`}>
+      <div className="team-photo-wrap">
         {member.img ? (
-          <img src={member.img} alt={member.name} className="team-photo" />
+          <img className="team-photo" src={member.img} alt={member.name} />
         ) : (
-          <div className="team-photo-placeholder" style={{ background: member.color }}>
-            <span>{member.name.split(' ').map(n => n[0]).join('')}</span>
+          <div className="team-photo-placeholder">
+            <span>{member.initials}</span>
           </div>
         )}
-        {/* Color strip at bottom of photo */}
-        <div className="team-photo-strip" style={{ background: member.color }} />
       </div>
 
-      {/* Info */}
       <div className="team-card-body">
-        <div className="team-card-header">
+        <header className="team-card-header">
           <div>
+            <div className="team-role">{member.role}</div>
             <h3 className="team-name">{member.name}</h3>
-            <p className="team-role" style={{ color: member.color }}>{member.role}</p>
           </div>
-        </div>
+        </header>
 
-        {/* Story paragraphs */}
+        <div className="team-divider" />
+
         <div className="team-story">
-          {member.story.map((para, i) => (
-            <p key={i}>{para}</p>
-          ))}
+          {member.story.map((p, i) => <p key={i}>{p}</p>)}
         </div>
 
-        {/* Quote */}
-        <blockquote
-          className="team-quote"
-          style={{
-            borderLeftColor: member.color,
-            background: member.accent,
-          }}
-        >
-          <span className="team-quote-mark" style={{ color: member.color }}>"</span>
-          {member.quote}
+        <blockquote className="team-quote">
+          <Quote className="team-quote-icon" size={18} strokeWidth={1.5} />
+          <span>{member.quote}</span>
         </blockquote>
 
-        {/* Tags */}
-        <div className="team-tags">
-          {member.tags.map(tag => (
-            <span
-              key={tag}
-              className="team-tag"
-              style={{ background: member.accent, color: member.color }}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+        <ul className="team-expertise">
+          {member.expertise.map(t => <li key={t}>{t}</li>)}
+        </ul>
       </div>
-    </div>
+    </article>
   )
 }
 
 // ── Main page ─────────────────────────────────────────────────
-export default function AboutPage() {
+export default function AboutUs() {
   return (
     <>
       <main className="about-page">
 
         {/* ── Hero ── */}
-        <div className="about-hero">
+        <section className="about-hero">
           <div className="about-hero-inner">
-            <div className="contact-breadcrumb">
+            <nav className="about-crumbs" aria-label="Breadcrumb">
               <Link to="/">Home</Link>
-              <span>/</span>
-              <span>About Us</span>
-            </div>
-            <p className="about-hero-eyebrow">Our Story</p>
+              <ChevronRight size={14} strokeWidth={1.5} />
+              <span>About</span>
+            </nav>
+
+            <div className="about-hero-eyebrow">Est. 2024 — Ile-Ife, Nigeria</div>
+
             <h1 className="about-hero-title">
-              Made in <em>Ile-Ife.</em><br />
-              Delivered with <em>love.</em>
+              A small kitchen,<br />
+              <em>held to a serious standard.</em>
             </h1>
+
             <p className="about-hero-sub">
-              SweetHUB started with one question — why should finding fresh,
-              delicious snacks be so hard? We decided it shouldn't be.
-              Three people, one kitchen, and a whole lot of passion later,
-              here we are.
+              SweetHUB is an independent pastry company founded on the conviction that
+              consistency, freshness, and reliability should not be exceptional —
+              they should be the baseline.
             </p>
 
-            <div className="about-hero-location">
-              <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentColor">
-                <path d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z"/>
-              </svg>
-              Ile-Ife AP, Osun State, Nigeria
+            <div className="about-hero-meta">
+              <span className="about-hero-location">
+                <MapPin size={14} strokeWidth={1.5} />
+                AP Junction, Ile-Ife · Osun State
+              </span>
             </div>
           </div>
-
-          {/* Blobs */}
-          <div className="about-hero-blob about-blob-1" aria-hidden="true" />
-          <div className="about-hero-blob about-blob-2" aria-hidden="true" />
-          <div className="about-hero-blob about-blob-3" aria-hidden="true" />
-        </div>
+        </section>
 
         {/* ── Stats ── */}
         <Stats />
 
         {/* ── Origin story ── */}
-        <div className="about-origin">
+        <section className="about-origin">
           <div className="about-origin-inner">
-
             <div className="about-origin-text">
-              <p className="about-section-eyebrow">How it started</p>
+              <div className="about-section-eyebrow">Our Origin</div>
               <h2 className="about-section-title">
-                A problem worth <em>solving</em>
+                Built to solve a problem<br />
+                <em>worth solving.</em>
               </h2>
+
               <p>
-                Every morning in Ile-Ife, people wake up wanting something
-                fresh, something delicious, something that doesn't come wrapped
-                in plastic from yesterday. Finding it? That was the problem.
+                SweetHUB began with a clear observation: residents of Ile-Ife had
+                limited access to pastry of dependable quality, prepared the same day,
+                and delivered within a window they could plan around.
               </p>
+
               <p>
-                Michael had watched Joy bake for long enough to know she had
-                something special. But special alone doesn't reach people.
-                You need a system. You need a brand. You need a plan.
+                Joy had built a reputation locally for the standard of her work.
+                Michael, on completing his degree at OAU in 2024, recognised that this
+                standard could be extended — through proper systems, infrastructure, and
+                brand discipline — to a far broader customer base. Janet completed the
+                team by taking ownership of the operational layer.
               </p>
+
               <p>
-                Fresh out of OAU in 2024, he sat down with Joy and said —
-                <em> "Let's stop keeping this a secret."</em>
-              </p>
-              <p>
-                SweetHUB was born that day. Not in a boardroom. Not with
-                investors. Just three people who believed that great food
-                deserves to reach great people — fast, fresh, and with
-                a whole lot of heart.
+                The company we built is small by design. It is structured to protect the
+                quality of the product, not to dilute it. Every order is fulfilled by
+                the same three people who founded the business.
               </p>
             </div>
 
-            <div className="about-origin-milestones">
-              <h3 className="about-milestones-title">Our journey</h3>
-              {MILESTONES.map((m, i) => (
-                <div key={i} className="about-milestone">
-                  <div className="am-icon">{m.icon}</div>
-                  <div className="am-line">
-                    <div className="am-dot" />
-                    {i < MILESTONES.length - 1 && <div className="am-connector" />}
-                  </div>
-                  <div className="am-content">
-                    <span className="am-year">{m.year}</span>
-                    <p className="am-event">{m.event}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <aside className="about-origin-side">
+              <div className="about-section-eyebrow">Timeline</div>
+              <h3 className="about-milestones-title">Key milestones</h3>
 
+              <ol className="about-milestones">
+                {MILESTONES.map((m, i) => (
+                  <li className="about-milestone" key={i}>
+                    <div className="am-rail">
+                      <span className="am-dot" />
+                      {i < MILESTONES.length - 1 && <span className="am-line" />}
+                    </div>
+                    <div className="am-content">
+                      <div className="am-year">{m.year}</div>
+                      <div className="am-event">{m.event}</div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </aside>
           </div>
-        </div>
+        </section>
 
         {/* ── Team ── */}
-        <div className="about-team-section">
+        <section className="about-team-section">
           <div className="about-team-header">
-            <p className="about-section-eyebrow">The people behind every bite</p>
-            <h2 className="about-section-title">Meet the <em>team</em></h2>
+            <div className="about-section-eyebrow">Leadership</div>
+            <h2 className="about-section-title">
+              Three founders. <em>One standard.</em>
+            </h2>
             <p className="about-team-sub">
-              Small team. Big heart. Every order you place is touched
-              by at least one of these three people.
+              SweetHUB is operated end-to-end by its founders. Every order you place is
+              produced, packed, and accounted for by the same three people.
             </p>
           </div>
 
           <div className="about-team-grid">
-            {TEAM.map((member, i) => (
-              <TeamCard key={member.name} member={member} index={i} />
-            ))}
+            {TEAM.map((m) => <TeamCard key={m.name} member={m} />)}
           </div>
-        </div>
+        </section>
 
         {/* ── Values ── */}
-        <div className="about-values">
+        <section className="about-values">
           <div className="about-values-inner">
             <div className="about-values-header">
-              <p className="about-section-eyebrow">What we stand for</p>
-              <h2 className="about-section-title">Our <em>values</em></h2>
+              <div className="about-section-eyebrow">Operating Principles</div>
+              <h2 className="about-section-title">
+                The standards we will <em>not negotiate.</em>
+              </h2>
             </div>
+
             <div className="about-values-grid">
-              {VALUES.map((v, i) => (
-                <div key={i} className="about-value-card">
-                  <span className="avc-icon">{v.icon}</span>
-                  <h3 className="avc-title">{v.title}</h3>
-                  <p className="avc-desc">{v.desc}</p>
+              {VALUES.map(({ Icon, title, desc }, i) => (
+                <div className="about-value-card" key={i}>
+                  <div className="avc-icon-wrap">
+                    <Icon size={22} strokeWidth={1.5} />
+                  </div>
+                  <h3 className="avc-title">{title}</h3>
+                  <p className="avc-desc">{desc}</p>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* ── Bottom CTA ── */}
-        <div className="about-cta">
+        {/* ── CTA ── */}
+        <section className="about-cta">
           <div className="about-cta-inner">
+            <div className="about-cta-eyebrow">Order Today</div>
             <h2>
-              Now that you know us —<br />
-              <em>let's feed you.</em>
+              Now that you understand <em>how we work —</em><br />
+              experience the result.
             </h2>
             <p>
-              Every order is a little piece of what Joy, Michael and Janet
-              put their hearts into. We can't wait for you to taste it.
+              Browse the menu, place an order, and see the standard for yourself.
+              Same-day preparation. Thirty-minute delivery. No exceptions.
             </p>
             <div className="about-cta-btns">
               <Link to="/#order" className="about-cta-primary">
-                Order Now
-                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor">
-                  <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z"/>
-                </svg>
+                View the Menu
+                <ArrowUpRight size={18} strokeWidth={2} />
               </Link>
               <Link to="/contact" className="about-cta-secondary">
-                Get in Touch
+                Contact Us
               </Link>
             </div>
           </div>
-        </div>
+        </section>
 
       </main>
       <Footer />
