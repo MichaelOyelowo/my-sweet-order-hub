@@ -3234,7 +3234,7 @@
   border: 1px solid var(--ad-border);
   border-radius: var(--ad-radius);
   box-shadow: var(--ad-shadow-sm);
-  overflow: hidden;
+  overflow-x: scroll;
 }
 .admin-table {
   width: 100%;
@@ -3498,6 +3498,245 @@
   transition: filter .15s;
 }
 .admin-login-btn:hover { filter: brightness(1.05); }
+/* ── Payment info bar ── */
+.admin-payment-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: #fff8f3;
+  border: 1px solid #f0d9cc;
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--ad-text);
+}
+
+.apb-label {
+  font-weight: 700;
+  color: var(--ad-accent);
+  flex-shrink: 0;
+}
+
+.apb-item { color: var(--ad-text); }
+
+.apb-divider {
+  width: 1px;
+  height: 16px;
+  background: #e0c8bb;
+  flex-shrink: 0;
+}
+
+.apb-copy {
+  margin-left: auto;
+  background: var(--ad-accent);
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.apb-copy:hover { filter: brightness(1.08); }
+
+/* ── Clickable phone button ── */
+.admin-phone-btn {
+  background: #e7f6ec;
+  border: 1px solid #b7e3c4;
+  color: #1a7a3c;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.admin-phone-btn:hover { background: #d0f0da; }
+
+.admin-phone-btn-lg {
+  font-size: 14px;
+  padding: 7px 14px;
+}
+
+/* ── Modal payment details ── */
+.admin-modal-payment {
+  background: #fff8f3;
+  border: 1px solid #f0d9cc;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-top: 20px;
+}
+
+.admin-modal-payment h3 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ad-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.amp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px dashed #f0d9cc;
+  font-size: 14px;
+}
+
+.amp-row:last-child { border-bottom: none; }
+.amp-label { color: var(--ad-muted); font-weight: 500; }
+.amp-value { font-weight: 600; color: var(--ad-text); }
+.amp-accent { color: var(--ad-accent); font-size: 15px; }
+
+/* ── WA preview modal ── */
+.admin-wa-preview {
+  max-width: 560px;
+}
+
+.admin-wa-status-pick {
+  margin-bottom: 16px;
+}
+
+.admin-wa-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ad-muted);
+  margin-bottom: 10px;
+}
+
+.admin-wa-status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-wa-tab {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--ad-border);
+  background: var(--ad-surface);
+  color: var(--ad-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.admin-wa-tab:hover { border-color: #25d366; color: #1a7a3c; }
+.admin-wa-tab.active { font-weight: 700; }
+
+/* WA message preview bubble */
+.admin-wa-preview-box {
+  background: #e5ddd5;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.admin-wa-preview-header {
+  background: #075e54;
+  color: white;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-wa-preview-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #25d366;
+}
+
+.admin-wa-bubble {
+  padding: 12px 14px;
+  background: white;
+  margin: 10px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.wa-line, .wa-item, .wa-bold {
+  margin: 2px 0;
+  font-size: 13px;
+  color: #111;
+  line-height: 1.5;
+}
+
+.wa-bold  { font-weight: 700; }
+.wa-item  { padding-left: 10px; color: #444; }
+
+/* Payment reminder box */
+.admin-payment-reminder {
+  background: #fff8f3;
+  border: 1px solid #f0d9cc;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.apr-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ad-accent);
+  margin-bottom: 8px;
+}
+
+.apr-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.apr-details span {
+  font-size: 12px;
+  color: var(--ad-text);
+}
+
+/* WA send button */
+.admin-wa-send-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: #25d366;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 4px 16px rgba(37,211,102,0.3);
+}
+
+.admin-wa-send-btn:hover {
+  background: #1da851;
+  transform: translateY(-1px);
+}
+
+.admin-wa-send-sm {
+  width: auto;
+  padding: 10px 20px;
+  font-size: 13px;
+}
 
 /* ───── RESPONSIVE ───── */
 @media (max-width: 768px) {
