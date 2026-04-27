@@ -1,14 +1,10 @@
-// This is the full /games page.
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabaseClient'
 
-// ── Config ────────────────────────────────────────────────────
 const WHATSAPP = '2349029702549'
 const fmt      = (n) => '₦' + n.toLocaleString()
 
-
-// ── Rewards ───────────────────────────────────────────────────
 const REWARDS = [
   { id: 'puffpuff', emoji: '🟠', label: 'Free Puff Puff',     desc: '5 free pieces of puff puff on your next order',  code: 'WIN-PUFF'    },
   { id: 'chinchin', emoji: '🟡', label: 'Free Chin-Chin',     desc: '3 free sachets of chin-chin on your next order', code: 'WIN-CHIN'    },
@@ -33,15 +29,317 @@ const fmtTime  = (s) => `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(
 const genCode  = (base) => `${base}-${Math.random().toString(36).slice(2,6).toUpperCase()}`
 const randItem = (arr)  => arr[Math.floor(Math.random() * arr.length)]
 
-// ── Game configs ──────────────────────────────────────────────
 const GAME_CONFIGS = [
-  { id: 'puzzle', name: 'Sliding Puzzle',   emoji: '🧩', tagline: 'Slide the tiles into order',      time: '3 minutes', tip: 'Use arrow keys or click tiles', color: '#c0392b' },
-  { id: 'memory', name: 'Memory Match',     emoji: '🃏', tagline: 'Find all matching food pairs',    time: '2 minutes', tip: 'Remember where each food hides', color: '#8e44ad' },
+  { id: 'puzzle', name: 'Sliding Puzzle',   emoji: '🧩', tagline: 'Slide the tiles into order',      time: '3 minutes',  tip: 'Use arrow keys or click tiles',  color: '#c0392b' },
+  { id: 'memory', name: 'Memory Match',     emoji: '🃏', tagline: 'Find all matching food pairs',    time: '2 minutes',  tip: 'Remember where each food hides', color: '#8e44ad' },
   { id: 'catch',  name: 'Catch the Snacks', emoji: '🍿', tagline: 'Catch 15 snacks in your basket', time: '60 seconds', tip: 'Move mouse or arrow keys',       color: '#e67e22' },
 ]
 
+// ══════════════════════════════════════════════════════════════
+// COUNTDOWN HOOK
+// ══════════════════════════════════════════════════════════════
+function useCountdown(targetDate) {
+  const getTimeLeft = (target) => {
+    const diff    = Math.max(0, new Date(target).getTime() - Date.now())
+    const days    = Math.floor(diff / (1000 * 60 * 60 * 24))
+    const hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+    return { days, hours, minutes, seconds, total: diff }
+  }
 
-// ── SLIDING PUZZLE ────────────────────────────────────────────
+  const [timeLeft, setTimeLeft] = useState(() =>
+    targetDate ? getTimeLeft(targetDate) : { days:0, hours:0, minutes:0, seconds:0, total:0 }
+  )
+
+  useEffect(() => {
+    if (!targetDate) return
+    setTimeLeft(getTimeLeft(targetDate))
+    const t = setInterval(() => setTimeLeft(getTimeLeft(targetDate)), 1000)
+    return () => clearInterval(t)
+  }, [targetDate])
+
+  return timeLeft
+}
+
+// ══════════════════════════════════════════════════════════════
+// COOLDOWN TIMER DISPLAY
+// ══════════════════════════════════════════════════════════════
+function CooldownTimer({ nextClaimAt }) {
+  const { days, hours, minutes, seconds, total } = useCountdown(nextClaimAt)
+  if (total <= 0) return null
+
+  const units = [
+    { value: days,    label: days === 1    ? 'Day'    : 'Days'    },
+    { value: hours,   label: hours === 1   ? 'Hour'   : 'Hours'   },
+    { value: minutes, label: minutes === 1 ? 'Minute' : 'Minutes' },
+    { value: seconds, label: seconds === 1 ? 'Second' : 'Seconds' },
+  ]
+
+  const pctWaited = Math.round(100 - (total / (7 * 24 * 60 * 60 * 1000)) * 100)
+
+  return (
+    <div className="reward-cooldown">
+      <div className="rcd-header">
+        <span className="rcd-icon">⏳</span>
+        <div>
+          <p className="rcd-title">Next reward available in</p>
+          <p className="rcd-sub">Keep playing and having fun — your next reward is waiting!</p>
+        </div>
+      </div>
+
+      <div className="rcd-timer">
+        {units.map((u, i) => (
+          <div key={u.label} className="rcd-unit">
+            <div>
+              <div className="rcd-value">{String(u.value).padStart(2, '0')}</div>
+              <span className="rcd-label">{u.label}</span>
+            </div>
+            {i < units.length - 1 && <span className="rcd-colon">:</span>}
+          </div>
+        ))}
+      </div>
+
+      <div className="rcd-progress-wrap">
+        <div className="rcd-progress-fill" style={{ width: `${pctWaited}%` }} />
+      </div>
+      <p className="rcd-progress-label">{pctWaited}% of waiting done 😄</p>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════
+// REWARD SCREEN — with 7-day cooldown
+// ══════════════════════════════════════════════════════════════
+function RewardScreen({ onClose, gameId = 'unknown' }) {
+  const { user }                      = useAuth()
+  const [phase, setPhase]             = useState('checking') // checking | pick | cooldown | claimed | noauth
+  const [chosen, setChosen]           = useState(null)
+  const [code, setCode]               = useState('')
+  const [copied, setCopied]           = useState(false)
+  const [claiming, setClaiming]       = useState(false)
+  const [nextClaimAt, setNextClaimAt] = useState(null)
+
+  // ── Check cooldown on mount ──────────────────────────────────
+  useEffect(() => {
+    const check = async () => {
+      if (!user) { setPhase('noauth'); return }
+
+      const { data } = await supabase
+        .from('reward_claims')
+        .select('claimed_at')
+        .eq('user_id', user.id)
+        .order('claimed_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (!data) { setPhase('pick'); return }
+
+      const next = new Date(new Date(data.claimed_at).getTime() + 7 * 24 * 60 * 60 * 1000)
+      if (new Date() < next) {
+        setNextClaimAt(next)
+        setPhase('cooldown')
+      } else {
+        setPhase('pick')
+      }
+    }
+    check()
+  }, [user])
+
+  // ── Claim reward ─────────────────────────────────────────────
+  const pick = async (reward) => {
+    if (!user) { setPhase('noauth'); return }
+    setClaiming(true)
+
+    try {
+      const { data, error: rpcError } = await supabase.rpc('claim_reward', {
+        _reward_id:    reward.id,
+        _reward_label: reward.label,
+        _game_id:      gameId,
+      })
+
+      if (rpcError) {
+        if (rpcError.message?.includes('COOLDOWN:')) {
+          const epoch = parseFloat(rpcError.message.split('COOLDOWN:')[1])
+          setNextClaimAt(new Date(epoch * 1000))
+          setPhase('cooldown')
+          return
+        }
+        throw rpcError
+      }
+
+      const result = Array.isArray(data) ? data[0] : data
+      setChosen(reward)
+      setCode(result?.coupon_code || genCode(reward.code))
+      setPhase('claimed')
+
+    } catch (err) {
+      console.error('Claim error:', err)
+      setChosen(reward)
+      setCode(genCode(reward.code))
+      setPhase('claimed')
+    } finally {
+      setClaiming(false)
+    }
+  }
+
+  const copy = () => {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopied(true); setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  // ── Checking ─────────────────────────────────────────────────
+  if (phase === 'checking') return (
+    <div className="puzzle-screen" style={{ minHeight: 200 }}>
+      <div className="reward-checking">
+        <span className="reward-checking-spinner" />
+        <p>Checking your eligibility...</p>
+      </div>
+    </div>
+  )
+
+  // ── Not authenticated ─────────────────────────────────────────
+  if (phase === 'noauth') return (
+    <div className="puzzle-screen puzzle-claimed">
+      <div className="puzzle-result-emoji">🔐</div>
+      <h2 className="puzzle-result-title">Almost there!</h2>
+      <p className="puzzle-result-sub">
+        You crushed it! 🎉 To claim your reward you need to be logged in
+        so we can save it for you.
+      </p>
+      <div className="reward-noauth-btns">
+        <button
+          className="puzzle-start-btn"
+          style={{ background: 'var(--accent)', width: '100%' }}
+          onClick={onClose}
+        >
+          Login to Claim →
+        </button>
+        <button className="puzzle-skip" onClick={onClose}>Maybe later</button>
+      </div>
+    </div>
+  )
+
+  // ── Cooldown active ───────────────────────────────────────────
+  if (phase === 'cooldown') return (
+    <div className="puzzle-screen puzzle-claimed">
+      <div className="puzzle-confetti">
+        {['🎮','🎯','⭐','🕹️','🏅','💪'].map((e, i) => (
+          <span key={i} className="confetti-piece"
+            style={{ '--delay':`${i * 0.15}s`, '--x':`${8 + i * 15}%` }}>
+            {e}
+          </span>
+        ))}
+      </div>
+
+      <div className="puzzle-result-emoji">🎮</div>
+      <h2 className="puzzle-result-title">You're on a roll!</h2>
+      <p className="puzzle-result-sub">
+        You already claimed a reward recently. Come back when your
+        timer hits zero and claim again! 🔥
+      </p>
+
+      <CooldownTimer nextClaimAt={nextClaimAt} />
+
+      <div className="reward-cooldown-actions">
+        <p className="reward-cooldown-tip">
+          💡 <strong>Tip:</strong> Practice now so when your cooldown ends
+          you crush it faster than ever 😄
+        </p>
+        <button className="puzzle-retry-btn" onClick={onClose}>
+          Keep Playing 🎮
+        </button>
+        <button className="puzzle-skip" onClick={onClose}>Back to games</button>
+      </div>
+    </div>
+  )
+
+  // ── Reward claimed ────────────────────────────────────────────
+  if (phase === 'claimed' && chosen) return (
+    <div className="puzzle-screen puzzle-claimed">
+      <div className="puzzle-result-emoji">{chosen.emoji}</div>
+      <h2 className="puzzle-result-title">Reward Unlocked! 🎁</h2>
+      <p className="puzzle-result-sub">{chosen.desc}</p>
+
+      <div className="puzzle-code-box">
+        <span className="puzzle-code-label">Your reward code</span>
+        <div className="puzzle-code-display">
+          <span className="puzzle-code-text">{code}</span>
+          <button className="puzzle-code-copy" onClick={copy}>
+            {copied ? '✓ Copied!' : 'Copy'}
+          </button>
+        </div>
+      </div>
+
+      <div className="reward-next-claim">
+        <span>🗓️</span>
+        <span>Next reward available in <strong>7 days</strong></span>
+      </div>
+
+      <div className="puzzle-redeem-steps">
+        <p className="prs-title">How to redeem:</p>
+        <div className="prs-step"><span>1</span><p>Copy your code above</p></div>
+        <div className="prs-step"><span>2</span><p>Place your order via WhatsApp</p></div>
+        <div className="prs-step"><span>3</span><p>Mention your code — we'll apply it! 😊</p></div>
+      </div>
+
+      <a
+        className="puzzle-wa-btn"
+        href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+          `Hello SweetHUB! 🎮 I just won the game challenge!\n\nMy reward code: *${code}*\n(${chosen.label})\n\nI'd like to place an order and redeem my reward 😊`
+        )}`}
+        target="_blank" rel="noopener noreferrer" onClick={onClose}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+        Order Now & Redeem on WhatsApp
+      </a>
+      <button className="puzzle-skip" onClick={onClose}>I'll order later</button>
+    </div>
+  )
+
+  // ── Pick reward ───────────────────────────────────────────────
+  return (
+    <div className="puzzle-screen puzzle-result won">
+      <div className="puzzle-confetti">
+        {['🎉','🎊','✨','🎁','🏆','⭐','🎈','💫'].map((e, i) => (
+          <span key={i} className="confetti-piece"
+            style={{ '--delay':`${i * 0.1}s`, '--x':`${10 + i * 11}%` }}>
+            {e}
+          </span>
+        ))}
+      </div>
+      <div className="puzzle-result-emoji">🏆</div>
+      <h2 className="puzzle-result-title">You crushed it!</h2>
+      <p className="puzzle-result-sub">
+        Pick your reward below 👇
+        <br />
+        <span className="reward-one-claim-note">One reward per 7 days</span>
+      </p>
+      <div className="puzzle-rewards-grid">
+        {REWARDS.map(r => (
+          <button
+            key={r.id}
+            className={`puzzle-reward-card ${claiming ? 'claiming' : ''}`}
+            onClick={() => pick(r)}
+            disabled={claiming}
+          >
+            <span className="prc-emoji">{r.emoji}</span>
+            <span className="prc-label">{r.label}</span>
+            <span className="prc-desc">{r.desc}</span>
+            <span className="prc-pick">{claiming ? '⏳ Claiming...' : 'Pick this →'}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════
+// SLIDING PUZZLE
+// ══════════════════════════════════════════════════════════════
 const GRID  = 4
 const TILES = GRID * GRID
 const EMPTY = TILES - 1
@@ -161,7 +459,8 @@ function SlidingPuzzle({ onWin }) {
           const isEmpty = val === EMPTY
           const canMove = getNeighbors(tiles.indexOf(EMPTY)).includes(idx)
           return (
-            <button key={idx} className={`puzzle-tile ${isEmpty ? 'empty' : ''} ${canMove ? 'movable' : ''}`}
+            <button key={idx}
+              className={`puzzle-tile ${isEmpty ? 'empty' : ''} ${canMove ? 'movable' : ''}`}
               onClick={() => move(idx)} disabled={isEmpty}
               style={isEmpty ? {} : { background: TILE_COLORS[val] }}>
               {!isEmpty && <><span className="pt-num">{val + 1}</span><span className="pt-lbl">{TILE_LABELS[val]}</span></>}
@@ -174,7 +473,9 @@ function SlidingPuzzle({ onWin }) {
   )
 }
 
-// ── MEMORY MATCH ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// MEMORY MATCH
+// ══════════════════════════════════════════════════════════════
 function shuffle(arr) {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -185,7 +486,10 @@ function shuffle(arr) {
 }
 
 function buildCards() {
-  const pairs = FOODS.slice(0, 8).flatMap(f => [{ ...f, uid: `${f.id}-a` }, { ...f, uid: `${f.id}-b` }])
+  const pairs = FOODS.slice(0, 8).flatMap(f => [
+    { ...f, uid: `${f.id}-a` },
+    { ...f, uid: `${f.id}-b` },
+  ])
   return shuffle(pairs)
 }
 
@@ -248,11 +552,13 @@ function MemoryMatch({ onWin }) {
       </div>
       <div className="memory-grid">
         {cards.map((card, idx) => {
-          const isFaceUp = flipped.includes(idx) || matched.includes(card.id)
+          const isFaceUp  = flipped.includes(idx) || matched.includes(card.id)
           const isMatched = matched.includes(card.id)
           return (
-            <button key={card.uid} className={`memory-card ${isFaceUp ? 'face-up' : ''} ${isMatched ? 'matched' : ''}`}
-              onClick={() => flip(idx)} disabled={isFaceUp} aria-label={isFaceUp ? card.name : 'Hidden card'}>
+            <button key={card.uid}
+              className={`memory-card ${isFaceUp ? 'face-up' : ''} ${isMatched ? 'matched' : ''}`}
+              onClick={() => flip(idx)} disabled={isFaceUp}
+              aria-label={isFaceUp ? card.name : 'Hidden card'}>
               <div className="mc-inner">
                 <div className="mc-back"><span>🍽️</span></div>
                 <div className="mc-front" style={{ background: card.color }}>
@@ -269,29 +575,27 @@ function MemoryMatch({ onWin }) {
   )
 }
 
-// ════════════════════════════════════════════════════════════
-// CATCH THE SNACKS — Updated with PS controller UI
-// ════════════════════════════════════════════════════════════
-
+// ══════════════════════════════════════════════════════════════
+// CATCH THE SNACKS — PS controller + combos
+// ══════════════════════════════════════════════════════════════
 const BASKET_W    = 72
 const GAME_W      = 320
 const ITEM_SIZE   = 36
-const FALL_SPEED  = 5.5      // faster than before (was 3)
-const SPAWN_RATE  = 1000     // faster spawns (was 1400)
+const FALL_SPEED  = 5.5
+const SPAWN_RATE  = 1000
 const WIN_SCORE   = 15
 const MAX_MISS    = 5
-const BASKET_STEP = 18       // pixels per controller press
+const BASKET_STEP = 18
 
 function CatchSnacks({ onWin }) {
-  const [basketX, setBasketX]     = useState(GAME_W / 2 - BASKET_W / 2)
-  const [items, setItems]         = useState([])
-  const [score, setScore]         = useState(0)
-  const [missed, setMissed]       = useState(0)
-  const [timeLeft, setTimeLeft]   = useState(60)
-  const [combo, setCombo]         = useState(0)
-  const [comboMsg, setComboMsg]   = useState(null) // { text, id }
+  const [basketX, setBasketX]       = useState(GAME_W / 2 - BASKET_W / 2)
+  const [items, setItems]           = useState([])
+  const [score, setScore]           = useState(0)
+  const [missed, setMissed]         = useState(0)
+  const [timeLeft, setTimeLeft]     = useState(60)
+  const [combo, setCombo]           = useState(0)
+  const [comboMsg, setComboMsg]     = useState(null)
   const [catchFlash, setCatchFlash] = useState(false)
-
   const gameRef    = useRef(null)
   const basketRef  = useRef(basketX)
   const itemsRef   = useRef([])
@@ -308,19 +612,10 @@ function CatchSnacks({ onWin }) {
 
   basketRef.current = basketX
 
-  // ── Haptic vibration ─────────────────────────────────────
-  const vibrate = (pattern) => {
-    if (navigator.vibrate) navigator.vibrate(pattern)
-  }
+  const vibrate = (p) => { if (navigator.vibrate) navigator.vibrate(p) }
 
-  // ── Combo message helper ──────────────────────────────────
   const showCombo = (streak) => {
-    const msgs = {
-      3:  '🔥 Combo x3!',
-      5:  '⚡ Combo x5!',
-      7:  '💥 INSANE x7!',
-      10: '🏆 GODLIKE x10!',
-    }
+    const msgs = { 3:'🔥 Combo x3!', 5:'⚡ Combo x5!', 7:'💥 INSANE x7!', 10:'🏆 GODLIKE x10!' }
     const text = msgs[streak]
     if (text) {
       const id = Date.now()
@@ -329,122 +624,81 @@ function CatchSnacks({ onWin }) {
     }
   }
 
-  // ── Mouse / touch move ────────────────────────────────────
   const handlePointerMove = useCallback((clientX) => {
     const rect = gameRef.current?.getBoundingClientRect()
     if (!rect) return
-    const rel = clientX - rect.left - BASKET_W / 2
-    setBasketX(Math.max(0, Math.min(GAME_W - BASKET_W, rel)))
+    setBasketX(Math.max(0, Math.min(GAME_W - BASKET_W, clientX - rect.left - BASKET_W / 2)))
   }, [])
 
   useEffect(() => {
     const onMouse = (e) => handlePointerMove(e.clientX)
     const onTouch = (e) => {
-      // Only track touches inside the game arena
       const rect = gameRef.current?.getBoundingClientRect()
       if (!rect) return
       const t = e.touches[0]
-      if (t.clientY >= rect.top && t.clientY <= rect.bottom) {
-        handlePointerMove(t.clientX)
-      }
+      if (t.clientY >= rect.top && t.clientY <= rect.bottom) handlePointerMove(t.clientX)
     }
     window.addEventListener('mousemove', onMouse)
     window.addEventListener('touchmove', onTouch, { passive: true })
-    return () => {
-      window.removeEventListener('mousemove', onMouse)
-      window.removeEventListener('touchmove', onTouch)
-    }
+    return () => { window.removeEventListener('mousemove', onMouse); window.removeEventListener('touchmove', onTouch) }
   }, [handlePointerMove])
 
-  // ── Keyboard controls ─────────────────────────────────────
   useEffect(() => {
     const onDown = (e) => { keysRef.current[e.key] = true }
     const onUp   = (e) => { keysRef.current[e.key] = false }
     window.addEventListener('keydown', onDown)
     window.addEventListener('keyup', onUp)
-    return () => {
-      window.removeEventListener('keydown', onDown)
-      window.removeEventListener('keyup', onUp)
-    }
+    return () => { window.removeEventListener('keydown', onDown); window.removeEventListener('keyup', onUp) }
   }, [])
 
-  // ── Controller button press handlers ─────────────────────
-  const pressLeft  = () => { btnRef.current.left  = true }
+  const pressLeft    = () => { btnRef.current.left  = true  }
   const releaseLeft  = () => { btnRef.current.left  = false }
-  const pressRight = () => { btnRef.current.right = true }
+  const pressRight   = () => { btnRef.current.right = true  }
   const releaseRight = () => { btnRef.current.right = false }
 
-  // ── Basket movement loop (keyboard + controller) ──────────
   useEffect(() => {
-    const moveLoop = setInterval(() => {
-      const left  = keysRef.current['ArrowLeft']  || keysRef.current['a'] || btnRef.current.left
-      const right = keysRef.current['ArrowRight'] || keysRef.current['d'] || btnRef.current.right
-      if (left)  setBasketX(p => Math.max(0, p - BASKET_STEP))
-      if (right) setBasketX(p => Math.min(GAME_W - BASKET_W, p + BASKET_STEP))
+    const loop = setInterval(() => {
+      if (keysRef.current['ArrowLeft']  || keysRef.current['a'] || btnRef.current.left)  setBasketX(p => Math.max(0, p - BASKET_STEP))
+      if (keysRef.current['ArrowRight'] || keysRef.current['d'] || btnRef.current.right) setBasketX(p => Math.min(GAME_W - BASKET_W, p + BASKET_STEP))
     }, 16)
-    return () => clearInterval(moveLoop)
+    return () => clearInterval(loop)
   }, [])
 
-  // ── Spawn items ───────────────────────────────────────────
   useEffect(() => {
     spawnRef.current = setInterval(() => {
       if (!gameActive.current) return
       const food = randItem(FOODS)
       const x    = Math.random() * (GAME_W - ITEM_SIZE)
-      itemsRef.current = [...itemsRef.current, {
-        id: nextId.current++, x, y: -ITEM_SIZE, food,
-        speedMult: 0.85 + Math.random() * 0.5, // slight speed variation per item
-      }]
+      itemsRef.current = [...itemsRef.current, { id: nextId.current++, x, y: -ITEM_SIZE, food, speedMult: 0.85 + Math.random() * 0.5 }]
     }, SPAWN_RATE)
     return () => clearInterval(spawnRef.current)
   }, [])
 
-  // ── Game loop ─────────────────────────────────────────────
   useEffect(() => {
     const loop = () => {
       const bx = basketRef.current
       itemsRef.current = itemsRef.current
         .map(item => ({ ...item, y: item.y + FALL_SPEED * item.speedMult }))
         .filter(item => {
-          // Caught
-          if (
-            item.y + ITEM_SIZE >= 260 &&
-            item.y <= 295 &&
-            item.x + ITEM_SIZE >= bx &&
-            item.x <= bx + BASKET_W
-          ) {
-            scoreRef.current += 1
-            comboRef.current += 1
-            setScore(scoreRef.current)
-            setCombo(comboRef.current)
+          if (item.y + ITEM_SIZE >= 260 && item.y <= 295 && item.x + ITEM_SIZE >= bx && item.x <= bx + BASKET_W) {
+            scoreRef.current += 1; comboRef.current += 1
+            setScore(scoreRef.current); setCombo(comboRef.current)
             showCombo(comboRef.current)
-            setCatchFlash(true)
-            setTimeout(() => setCatchFlash(false), 120)
-            vibrate(30) // short buzz on catch
-
+            setCatchFlash(true); setTimeout(() => setCatchFlash(false), 120)
+            vibrate(30)
             if (scoreRef.current >= WIN_SCORE) {
               gameActive.current = false
-              cancelAnimationFrame(rafRef.current)
-              clearInterval(spawnRef.current)
-              clearInterval(timerRef.current)
-              vibrate([50, 30, 50, 30, 100]) // win pattern
-              setTimeout(() => onWin(true), 300)
+              cancelAnimationFrame(rafRef.current); clearInterval(spawnRef.current); clearInterval(timerRef.current)
+              vibrate([50,30,50,30,100]); setTimeout(() => onWin(true), 300)
             }
             return false
           }
-          // Missed
           if (item.y > 305) {
-            missRef.current += 1
-            comboRef.current = 0
-            setMissed(missRef.current)
-            setCombo(0)
-            vibrate([80, 40, 80]) // miss buzz
-
+            missRef.current += 1; comboRef.current = 0
+            setMissed(missRef.current); setCombo(0); vibrate([80,40,80])
             if (missRef.current >= MAX_MISS) {
               gameActive.current = false
-              cancelAnimationFrame(rafRef.current)
-              clearInterval(spawnRef.current)
-              clearInterval(timerRef.current)
+              cancelAnimationFrame(rafRef.current); clearInterval(spawnRef.current); clearInterval(timerRef.current)
               setTimeout(() => onWin(false), 300)
             }
             return false
@@ -458,17 +712,13 @@ function CatchSnacks({ onWin }) {
     return () => cancelAnimationFrame(rafRef.current)
   }, [])
 
-  // ── Timer ─────────────────────────────────────────────────
   useEffect(() => {
     timerRef.current = setInterval(() => {
       setTimeLeft(p => {
         if (p <= 1) {
           gameActive.current = false
-          clearInterval(timerRef.current)
-          cancelAnimationFrame(rafRef.current)
-          clearInterval(spawnRef.current)
-          onWin(scoreRef.current >= WIN_SCORE)
-          return 0
+          clearInterval(timerRef.current); cancelAnimationFrame(rafRef.current); clearInterval(spawnRef.current)
+          onWin(scoreRef.current >= WIN_SCORE); return 0
         }
         return p - 1
       })
@@ -481,13 +731,8 @@ function CatchSnacks({ onWin }) {
 
   return (
     <div className="game-wrap catch-wrap">
-
-      {/* ── Stats bar ── */}
       <div className="game-topbar">
-        <div className="game-stat">
-          <span className="gs-label">Caught</span>
-          <span className="gs-val">{score}/{WIN_SCORE}</span>
-        </div>
+        <div className="game-stat"><span className="gs-label">Caught</span><span className="gs-val">{score}/{WIN_SCORE}</span></div>
         <div className="game-timer-ring-wrap">
           <svg viewBox="0 0 44 44" className="game-timer-svg">
             <circle cx="22" cy="22" r="18" fill="none" stroke="#f0e6dc" strokeWidth="3"/>
@@ -502,424 +747,60 @@ function CatchSnacks({ onWin }) {
         </div>
         <div className="game-stat">
           <span className="gs-label">Missed</span>
-          <span className="gs-val" style={{ color: missRef.current > 0 ? '#c0392b' : 'inherit' }}>
-            {missed}/{MAX_MISS}
-          </span>
+          <span className="gs-val" style={{ color: missRef.current > 0 ? '#c0392b' : 'inherit' }}>{missed}/{MAX_MISS}</span>
         </div>
       </div>
 
-      {/* Combo badge */}
-      {combo >= 3 && (
-        <div className="catch-combo-badge">
-          🔥 {combo} combo
-        </div>
-      )}
+      {combo >= 3 && <div className="catch-combo-badge">🔥 {combo} combo</div>}
 
-      {/* Score bar */}
       <div className="catch-score-bar-wrap">
-        <div
-          className="catch-score-bar-fill"
-          style={{ width: `${(score / WIN_SCORE) * 100}%` }}
-        />
+        <div className="catch-score-bar-fill" style={{ width: `${(score / WIN_SCORE) * 100}%` }} />
         <span className="catch-score-bar-label">{score} / {WIN_SCORE} snacks caught</span>
       </div>
 
-      {/* ── Game arena ── */}
-      <div
-        className={`catch-arena ${catchFlash ? 'catch-flash' : ''}`}
-        ref={gameRef}
-        style={{ width: GAME_W, height: 300 }}
-      >
-        {/* Falling items */}
+      <div className={`catch-arena ${catchFlash ? 'catch-flash' : ''}`} ref={gameRef} style={{ width: GAME_W, height: 300 }}>
         {items.map(item => (
-          <div
-            key={item.id}
-            className="catch-item"
-            style={{ left: item.x, top: item.y, width: ITEM_SIZE, height: ITEM_SIZE }}
-            aria-hidden="true"
-          >
+          <div key={item.id} className="catch-item" style={{ left: item.x, top: item.y, width: ITEM_SIZE, height: ITEM_SIZE }} aria-hidden="true">
             <span>{item.food.emoji}</span>
           </div>
         ))}
-
-        {/* Basket */}
-        <div
-          className="catch-basket"
-          style={{ left: basketX, width: BASKET_W }}
-          aria-label="Basket"
-        >
-          🧺
-        </div>
-
-        {/* Miss dots */}
+        <div className="catch-basket" style={{ left: basketX, width: BASKET_W }} aria-label="Basket">🧺</div>
         <div className="catch-misses">
           {Array.from({ length: MAX_MISS }).map((_, i) => (
             <span key={i} className={`catch-miss-dot ${i < missed ? 'lost' : ''}`} />
           ))}
         </div>
-
-        {/* Floating combo message */}
         {comboMsg && (
-          <div key={comboMsg.id} className="catch-combo-pop" aria-live="polite">
-            {comboMsg.text}
-          </div>
+          <div key={comboMsg.id} className="catch-combo-pop" aria-live="polite">{comboMsg.text}</div>
         )}
       </div>
 
-      {/* ── PS-style controller ── */}
       <div className="catch-controller" aria-label="Game controller">
-
-        {/* Left button */}
-        <button
-          className="ctrl-btn ctrl-left"
-          onPointerDown={pressLeft}
-          onPointerUp={releaseLeft}
-          onPointerLeave={releaseLeft}
-          aria-label="Move left"
-        >
+        <button className="ctrl-btn ctrl-left" onPointerDown={pressLeft} onPointerUp={releaseLeft} onPointerLeave={releaseLeft} aria-label="Move left">
           <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="currentColor">
             <path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"/>
           </svg>
         </button>
-
-        {/* Centre display */}
         <div className="ctrl-centre">
           <div className="ctrl-centre-inner">
             <span className="ctrl-score">{score}</span>
             <span className="ctrl-score-label">caught</span>
           </div>
         </div>
-
-        {/* Right button */}
-        <button
-          className="ctrl-btn ctrl-right"
-          onPointerDown={pressRight}
-          onPointerUp={releaseRight}
-          onPointerLeave={releaseRight}
-          aria-label="Move right"
-        >
+        <button className="ctrl-btn ctrl-right" onPointerDown={pressRight} onPointerUp={releaseRight} onPointerLeave={releaseRight} aria-label="Move right">
           <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="currentColor">
             <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/>
           </svg>
         </button>
-
       </div>
-
       <p className="game-hint">Tap ← → buttons · Move mouse · Arrow keys</p>
     </div>
   )
 }
 
-// ── REWARD SCREEN ─────────────────────────────────────────────
-const COOLDOWN_DAYS = 7
-const COOLDOWN_MS   = COOLDOWN_DAYS * 24 * 60 * 60 * 1000
-
-function formatCountdown(ms) {
-  if (ms <= 0) return '0d 00h 00m 00s'
-  const totalSec = Math.floor(ms / 1000)
-  const days  = Math.floor(totalSec / 86400)
-  const hours = Math.floor((totalSec % 86400) / 3600)
-  const mins  = Math.floor((totalSec % 3600) / 60)
-  const secs  = totalSec % 60
-  const pad = (n) => String(n).padStart(2, '0')
-  return `${days}d ${pad(hours)}h ${pad(mins)}m ${pad(secs)}s`
-}
-
-function splitCountdown(ms) {
-  const safe = Math.max(0, ms)
-  const totalSec = Math.floor(safe / 1000)
-  const pad = (n) => String(n).padStart(2, '0')
-  return {
-    days:  String(Math.floor(totalSec / 86400)),
-    hours: pad(Math.floor((totalSec % 86400) / 3600)),
-    mins:  pad(Math.floor((totalSec % 3600) / 60)),
-    secs:  pad(totalSec % 60),
-  }
-}
-
-const COOLDOWN_STYLES = `
-.cooldown-screen{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:32px 20px;text-align:center;color:#fff;
-  background:radial-gradient(circle at 50% 0%, rgba(255,107,157,0.25), transparent 60%),
-             linear-gradient(160deg,#1a1033 0%,#2a1654 60%,#1a1033 100%);
-  border-radius:24px;min-height:520px;position:relative;overflow:hidden;
-}
-.cooldown-screen::before{
-  content:"";position:absolute;inset:-2px;border-radius:24px;padding:2px;
-  background:linear-gradient(135deg,#ff6b9d,#a855f7,#06b6d4);
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.7;
-}
-.cooldown-emoji{font-size:64px;margin-bottom:12px;animation:cooldown-bounce 2.4s ease-in-out infinite;}
-@keyframes cooldown-bounce{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-10px) rotate(5deg);}}
-.cooldown-title{font-size:28px;font-weight:800;margin:0 0 8px;
-  background:linear-gradient(90deg,#ff6b9d,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.cooldown-sub{font-size:15px;line-height:1.5;color:rgba(255,255,255,.75);max-width:340px;margin:0 0 24px;}
-.cooldown-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(255,255,255,.55);margin-bottom:14px;}
-.cooldown-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;max-width:340px;margin-bottom:8px;}
-.cooldown-cell{
-  background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));
-  border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:14px 6px 10px;
-  box-shadow:0 8px 24px -12px rgba(168,85,247,.6),inset 0 1px 0 rgba(255,255,255,.08);
-}
-.cooldown-num{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;
-  color:#fff;text-shadow:0 0 18px rgba(255,107,157,.55);}
-.cooldown-unit{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
-  color:rgba(255,255,255,.6);margin-top:6px;}
-.cooldown-cell.pulse .cooldown-num{animation:cooldown-pulse 1s ease-in-out infinite;}
-@keyframes cooldown-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.65;transform:scale(.95);}}
-.cooldown-ready{font-size:12px;color:rgba(255,255,255,.6);margin:18px 0 24px;}
-.cooldown-back{
-  background:linear-gradient(135deg,#ff6b9d,#a855f7);color:#fff;border:none;
-  padding:12px 28px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;
-  box-shadow:0 10px 30px -10px rgba(168,85,247,.8);transition:transform .15s ease;
-}
-.cooldown-back:hover{transform:translateY(-2px);}
-`
-
-
-// localStorage key — works for both logged-in AND anonymous users
-const LAST_CLAIM_KEY = 'sweethub_last_reward_claim_at'
-
-function readLocalLastClaim() {
-  try {
-    const raw = localStorage.getItem(LAST_CLAIM_KEY)
-    if (!raw) return null
-    const ts = Number(raw)
-    if (!Number.isFinite(ts)) return null
-    return new Date(ts)
-  } catch { return null }
-}
-function writeLocalLastClaim(date) {
-  try { localStorage.setItem(LAST_CLAIM_KEY, String(date.getTime())) } catch {}
-}
-
-function RewardScreen({ onClose }) {
-  const { user } = useAuth()                    // ✅ hook inside component
-  const [chosen, setChosen] = useState(null)
-  const [code, setCode]     = useState('')
-  const [copied, setCopied] = useState(false)
-  const [claiming, setClaiming] = useState(false)
-
-  // Cooldown state — start with localStorage value so cooldown applies INSTANTLY
-  // (even before Supabase responds, even for anonymous users)
-  const [checking, setChecking]   = useState(true)
-  const [lastClaim, setLastClaim] = useState(() => readLocalLastClaim())
-  const [now, setNow]             = useState(() => Date.now())
-
-  // 1) On mount: also look up the user's most recent claim from Supabase
-  //    and use whichever is MORE RECENT (server vs local) — server wins ties.
-  useEffect(() => {
-    let cancelled = false
-    const check = async () => {
-      if (!user) { setChecking(false); return }
-      try {
-        const { data, error } = await supabase
-          .from('reward_claims')
-          .select('claimed_at')
-          .eq('user_id', user.id)
-          .order('claimed_at', { ascending: false })
-          .limit(1)
-        if (cancelled) return
-        if (error) {
-          console.error('Cooldown check error:', error)
-        } else if (data && data.length > 0 && data[0].claimed_at) {
-          const serverDate = new Date(data[0].claimed_at)
-          setLastClaim(prev => {
-            const winner = (!prev || serverDate.getTime() > prev.getTime()) ? serverDate : prev
-            writeLocalLastClaim(winner)
-            return winner
-          })
-        }
-      } catch (err) {
-        console.error('Cooldown check failed:', err)
-      } finally {
-        if (!cancelled) setChecking(false)
-      }
-    }
-    check()
-    return () => { cancelled = true }
-  }, [user])
-
-  // 2) Tick every second while we're in cooldown
-  const cooldownEndsAt = lastClaim ? lastClaim.getTime() + COOLDOWN_MS : 0
-  const msLeft         = cooldownEndsAt - now
-  const inCooldown     = lastClaim && msLeft > 0
-
-  useEffect(() => {
-    if (!inCooldown) return
-    const id = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [inCooldown])
-
-  const pick = async (r) => {
-    if (!user) {
-      alert('Please log in or sign up first to claim your reward!')
-      return
-    }
-    // Hard guard: never allow claiming during cooldown
-    if (inCooldown) return
-
-    setClaiming(true)
-    try {
-      const { data, error } = await supabase.rpc('claim_reward', {
-        _reward_id:    r.id,
-        _reward_label: r.label,
-      })
-      const nowDate = new Date()
-      if (error) {
-        console.error('Claim error:', error)
-        setChosen(r)
-        setCode(genCode(r.code))
-      } else {
-        setChosen(r)
-        setCode(data?.[0]?.coupon_code || genCode(r.code))
-      }
-      // Start the 7-day cooldown immediately — both in state AND localStorage
-      setLastClaim(nowDate)
-      setNow(nowDate.getTime())
-      writeLocalLastClaim(nowDate)
-    } catch (err) {
-      console.error('Unexpected error:', err)
-      const nowDate = new Date()
-      setChosen(r)
-      setCode(genCode(r.code))
-      setLastClaim(nowDate)
-      setNow(nowDate.getTime())
-      writeLocalLastClaim(nowDate)
-    } finally {
-      setClaiming(false)
-    }
-  }
-
-  const copy = () => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true); setTimeout(() => setCopied(false), 2000)
-    })
-  }
-
-  // ⛔ COOLDOWN GATE — checked FIRST, before "chosen" or anything else.
-  // This prevents users from claiming again by re-winning a game,
-  // and works for both logged-in users (Supabase) and anonymous users (localStorage).
-  if (inCooldown) {
-    const readyDate = new Date(cooldownEndsAt)
-    const dateStr = readyDate.toLocaleString(undefined, {
-      weekday: 'long', month: 'short', day: 'numeric',
-      hour: '2-digit', minute: '2-digit',
-    })
-    const t = splitCountdown(msLeft)
-    return (
-      <>
-        <style>{COOLDOWN_STYLES}</style>
-        <div className="cooldown-screen">
-          <div className="cooldown-emoji">🎮</div>
-          <h2 className="cooldown-title">Keep having fun! 😜</h2>
-          <p className="cooldown-sub">
-            You already claimed a reward this week. Play as much as you like —
-            come back to claim another reward in:
-          </p>
-
-          <div className="cooldown-label">Next reward unlocks in</div>
-          <div className="cooldown-grid">
-            <div className="cooldown-cell">
-              <div className="cooldown-num">{t.days}</div>
-              <div className="cooldown-unit">Days</div>
-            </div>
-            <div className="cooldown-cell">
-              <div className="cooldown-num">{t.hours}</div>
-              <div className="cooldown-unit">Hours</div>
-            </div>
-            <div className="cooldown-cell">
-              <div className="cooldown-num">{t.mins}</div>
-              <div className="cooldown-unit">Mins</div>
-            </div>
-            <div className="cooldown-cell pulse">
-              <div className="cooldown-num">{t.secs}</div>
-              <div className="cooldown-unit">Secs</div>
-            </div>
-          </div>
-
-          <div className="cooldown-ready">🗓 Available on {dateStr}</div>
-          <button className="cooldown-back" onClick={onClose}>Back to games →</button>
-        </div>
-      </>
-    )
-  }
-
-  // While we look up the user's last claim, show a tiny loader
-  if (user && checking) return (
-    <div className="puzzle-screen puzzle-result won">
-      <div className="puzzle-result-emoji">⏳</div>
-      <h2 className="puzzle-result-title">Checking your rewards…</h2>
-      <p className="puzzle-result-sub">One sec while we load your status.</p>
-    </div>
-  )
-
-  // Reward successfully claimed — show the code
-  if (chosen) return (
-    <div className="puzzle-screen puzzle-claimed">
-      <div className="puzzle-result-emoji">{chosen.emoji}</div>
-      <h2 className="puzzle-result-title">Reward Unlocked! 🎁</h2>
-      <p className="puzzle-result-sub">{chosen.desc}</p>
-      <div className="puzzle-code-box">
-        <span className="puzzle-code-label">Your reward code</span>
-        <div className="puzzle-code-display">
-          <span className="puzzle-code-text">{code}</span>
-          <button className="puzzle-code-copy" onClick={copy}>{copied ? '✓ Copied!' : 'Copy'}</button>
-        </div>
-      </div>
-      <div className="puzzle-redeem-steps">
-        <p className="prs-title">How to redeem:</p>
-        <div className="prs-step"><span>1</span><p>Copy your code above</p></div>
-        <div className="prs-step"><span>2</span><p>Place your order via WhatsApp</p></div>
-        <div className="prs-step"><span>3</span><p>Mention your code — we'll apply it! 😊</p></div>
-      </div>
-      <a className="puzzle-wa-btn"
-        href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`Hello SweetHUB! 🎮 I just won the game challenge!\n\nMy reward code: *${code}*\n(${chosen.label})\n\nI'd like to place an order and redeem my reward 😊`)}`}
-        target="_blank" rel="noopener noreferrer" onClick={onClose}>
-        <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="currentColor">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-        </svg>
-        Order Now & Redeem on WhatsApp
-      </a>
-      <button className="puzzle-skip" onClick={onClose}>I'll order later</button>
-    </div>
-  )
-
-  return (
-    <div className="puzzle-screen puzzle-result won">
-      <div className="puzzle-confetti">
-        {['🎉','🎊','✨','🎁','🏆','⭐','🎈','💫'].map((e, i) => (
-          <span key={i} className="confetti-piece" style={{ '--delay':`${i * 0.1}s`, '--x':`${10 + i * 11}%` }}>{e}</span>
-        ))}
-      </div>
-      <div className="puzzle-result-emoji">🏆</div>
-      <h2 className="puzzle-result-title">You crushed it!</h2>
-      <p className="puzzle-result-sub">Amazing job! Now pick your reward 👇</p>
-      <div className="puzzle-rewards-grid">
-        {REWARDS.map(r => (
-          <button
-            key={r.id}
-            className={`puzzle-reward-card ${claiming ? 'claiming' : ''}`}
-            onClick={() => pick(r)}
-            disabled={claiming}
-          >
-            <span className="prc-emoji">{r.emoji}</span>
-            <span className="prc-label">{r.label}</span>
-            <span className="prc-desc">{r.desc}</span>
-            <span className="prc-pick">
-              {claiming ? 'Claiming...' : 'Pick this →'}
-            </span>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ── MAIN GAMES PAGE ───────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// MAIN GAMES PAGE
+// ══════════════════════════════════════════════════════════════
 function GamesPage() {
   const [selectedGame, setSelectedGame] = useState(null)
   const [phase, setPhase]               = useState('select') // select → playing → won → lost
@@ -931,8 +812,6 @@ function GamesPage() {
 
   return (
     <div className="games-page">
-
-      {/* Header */}
       <div className="games-page-header">
         <div className="games-page-header-inner">
           <p className="order-eyebrow">SweetHUB Game Arena</p>
@@ -941,24 +820,17 @@ function GamesPage() {
             <span className="games-title-accent"> Eat Free.</span>
           </h1>
           <p className="games-page-sub">
-            Beat any challenge below and win a real reward on your next order.
-            A different game every visit.
+            Beat any challenge and win a real reward on your next order.
+            One reward per 7 days — make it count! 🏆
           </p>
         </div>
       </div>
 
       <div className="games-page-body">
-
-        {/* Game selection */}
         {phase === 'select' && (
           <div className="games-select-grid">
             {GAME_CONFIGS.map(g => (
-              <button
-                key={g.id}
-                className="games-select-card"
-                onClick={() => startGame(g.id)}
-                style={{ '--game-color': g.color }}
-              >
+              <button key={g.id} className="games-select-card" onClick={() => startGame(g.id)} style={{ '--game-color': g.color }}>
                 <div className="gsc-icon">{g.emoji}</div>
                 <h2 className="gsc-name">{g.name}</h2>
                 <p className="gsc-tagline">{g.tagline}</p>
@@ -966,15 +838,12 @@ function GamesPage() {
                   <span>⏱️ {g.time}</span>
                   <span>💡 {g.tip}</span>
                 </div>
-                <div className="gsc-play-btn" style={{ background: g.color }}>
-                  Play Now →
-                </div>
+                <div className="gsc-play-btn" style={{ background: g.color }}>Play Now →</div>
               </button>
             ))}
           </div>
         )}
 
-        {/* Active game */}
         {phase === 'playing' && config && (
           <div className="games-active-wrap">
             <div className="games-active-header">
@@ -992,14 +861,12 @@ function GamesPage() {
           </div>
         )}
 
-        {/* Won */}
         {phase === 'won' && (
           <div className="puzzle-modal games-inline-modal">
-            <RewardScreen onClose={reset} />
+            <RewardScreen onClose={reset} gameId={selectedGame || 'unknown'} />
           </div>
         )}
 
-        {/* Lost */}
         {phase === 'lost' && (
           <div className="puzzle-modal games-inline-modal">
             <div className="puzzle-screen puzzle-result lost">
@@ -1013,7 +880,6 @@ function GamesPage() {
             </div>
           </div>
         )}
-
       </div>
     </div>
   )
