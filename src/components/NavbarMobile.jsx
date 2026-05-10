@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import logo from '../assets/logo.png'
+import logo from '../assets/jovlora.png'
 
 export default function NavbarMobile({ cartCount, user, displayName, avatar, onLogin, onSignup, onLogout }) {
   const navigate    = useNavigate()
@@ -9,7 +9,7 @@ export default function NavbarMobile({ cartCount, user, displayName, avatar, onL
   const [searchOpen, setSearchOpen] = useState(false)
   const [switching, setSwitching]   = useState(false)
 
-  // Added Icons to match Jumia style
+
   const links =[
     { label: 'Home', path: '/', icon: <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> },
     { label: 'Shop', path: '/#order', icon: <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg> },

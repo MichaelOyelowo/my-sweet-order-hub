@@ -1,4 +1,7 @@
-import logo from '../assets/logo.png'
+import { useNavigate } from 'react-router-dom'
+
+
+import logo from '../assets/jovlora.png'
 
 const QUICK_LINKS =[
   { label: 'Home',         href: '#'            },
@@ -78,6 +81,7 @@ const SOCIALS =[
 ]
 
 export default function Footer() {
+  const navigate = useNavigate()
   const year = new Date().getFullYear()
 
   return (
@@ -100,7 +104,10 @@ export default function Footer() {
           {/* Col 1 — Brand */}
           <div className="footer-col footer-brand">
             <div className="footer-logo">
-              <img src={logo} alt="SweetHUB" className="footer-logo-img" />
+             <img src={logo} alt="Jovlora" className="footer-logo-img" 
+             onClick={() => navigate('/')}
+             style={{cursor: 'pointer'}}
+              />
             </div>
             <p className="footer-desc">
               Handcrafted snacks and baked goods delivered fresh to your door.

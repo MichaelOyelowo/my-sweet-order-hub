@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import logo from '../assets/logo.png'
+import logo from '../assets/jovlora.png'
 
 function Navbar({ cartCount, user, displayName, avatar, onLogin, onSignup, onLogout }) {
   const navigate = useNavigate()
