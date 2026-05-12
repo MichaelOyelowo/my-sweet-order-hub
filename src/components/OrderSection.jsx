@@ -899,7 +899,7 @@ function CustomOrderSection() {
   const handleSubmit = () => {
     if (!form.name || !form.phone || !form.item) return
     const msg =
-      `Hello SweetHUB! 🎨 Custom order request:\n\n` +
+      `Hello Jovlora! 🎨 Custom order request:\n\n` +
       `👤 Name: ${form.name}\n📞 Phone: ${form.phone}\n🍰 Item: ${form.item}\n` +
       `${form.quantity ? `📦 Qty: ${form.quantity}\n` : ''}` +
       `${form.occasion ? `🎉 Occasion: ${form.occasion}\n` : ''}` +
