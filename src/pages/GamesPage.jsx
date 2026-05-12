@@ -287,7 +287,7 @@ function RewardScreen({ onClose, gameId = 'unknown' }) {
       <a
         className="puzzle-wa-btn"
         href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-          `Hello SweetHUB! 🎮 I just won the game challenge!\n\nMy reward code: *${code}*\n(${chosen.label})\n\nI'd like to place an order and redeem my reward 😊`
+          `Hello Jovlora! 🎮 I just won the game challenge!\n\nMy reward code: *${code}*\n(${chosen.label})\n\nI'd like to place an order and redeem my reward 😊`
         )}`}
         target="_blank" rel="noopener noreferrer" onClick={onClose}
       >
@@ -814,7 +814,7 @@ function GamesPage() {
     <div className="games-page">
       <div className="games-page-header">
         <div className="games-page-header-inner">
-          <p className="order-eyebrow">SweetHUB Game Arena</p>
+          <p className="order-eyebrow">Jovlora Game Arena</p>
           <h1 className="games-page-title">
             Play. Win.
             <span className="games-title-accent"> Eat Free.</span>

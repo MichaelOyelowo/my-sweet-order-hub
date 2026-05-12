@@ -1,0 +1,24 @@
+{
+  "name": "Jovlora",
+  "short_name": "Jovlora",
+  "description": "Fresh snacks & baked goods delivered in Ile-Ife",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff8f3",
+  "theme_color": "#c0392b",
+  "icons": [
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["food", "shopping"],
+  "lang": "en-NG",
+  "orientation": "portrait"
+}

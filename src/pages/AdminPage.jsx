@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import logo from '../assets/jovlora.png'
 
-const ADMIN_PASSWORD = 'sweethub2024'
+const ADMIN_PASSWORD = 'jovlora2024'
 const fmt = (n) => '₦' + Number(n || 0).toLocaleString()
 
-// ── SweetHUB payment details ──────────────────────────────────
+// ── Jovlora payment details ──────────────────────────────────
 const PAYMENT = {
   bankName:      'Opay',
   accountNumber: '9029702549',
@@ -19,7 +20,7 @@ function buildWAMessage(order, status) {
     .map(i => `  • ${i.name} × ${i.qty} = ${fmt(i.total)}`)
     .join('\n')
 
-  const header = `Hello ${order.customer_name}! 👋 This is SweetHUB 🍰`
+  const header = `Hello ${order.customer_name}! 👋 This is Jovlora 🍰`
   const ref    = `Order Ref: *${order.order_ref}*`
   const items  = `\n*Your Order:*\n${itemLines}\n*Total: ${fmt(order.total)}*`
 
@@ -60,7 +61,7 @@ function buildWAMessage(order, status) {
       `${header}\n\n` +
       `✅ Your order has been *delivered!*\n${ref}\n${items}\n\n` +
       `We hope you enjoy every bite! 😋\n` +
-      `Thank you for choosing SweetHUB 🍰\n\n` +
+      `Thank you for choosing Jovlora 🍰\n\n` +
       `Please leave us a review — it means the world to us! ⭐⭐⭐⭐⭐`
     ),
     Cancelled: (
@@ -327,8 +328,8 @@ export default function AdminPage() {
     return (
       <div className="admin-login">
         <div className="admin-login-card">
-          <div className="admin-login-logo">🍰</div>
-          <h1 className="admin-login-title">SweetHUB Admin</h1>
+          <div className="admin-login-logo"><img src={logo} alt="jovlora logo" /></div>
+          <h1 className="admin-login-title">Jovlora Admin</h1>
           <p className="admin-login-sub">Enter your password to access the dashboard</p>
           <div className={`admin-login-field ${pwError ? 'error' : ''}`}>
             <input
@@ -391,7 +392,7 @@ export default function AdminPage() {
       {/* ── Header ── */}
       <div className="admin-header">
         <div className="admin-header-left">
-          <h1 className="admin-title">🍰 SweetHUB Orders</h1>
+          <h1 className="admin-title">Jovlora Orders</h1>
           <p className="admin-subtitle">{activeCount} active · {archivedCount} archived</p>
         </div>
         <div className="admin-header-right">

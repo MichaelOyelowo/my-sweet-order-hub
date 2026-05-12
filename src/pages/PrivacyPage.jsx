@@ -19,7 +19,7 @@ export default function PrivacyPage() {
       <div className="legal-container">
         <div className="legal-content">
           <h2>1. Introduction</h2>
-          <p>At SweetHUB, we respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you visit our website or place an order with us.</p>
+          <p>At Jovlora, we respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you visit our website or place an order with us.</p>
 
           <h2>2. Information We Collect</h2>
           <p>To provide you with our fresh bakery products and delivery services, we collect the following information:</p>
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
           <p><strong>We do not sell your personal data to third parties.</strong> We only share your data with trusted third-party service providers necessary to run our business, such as delivery logistics partners and secure email routing services (e.g., Resend).</p>
 
           <h2>5. Contact Us</h2>
-          <p>If you have any questions about this privacy policy or want to request the deletion of your data, please contact us at <a href="mailto:hello@sweethub.ng">hello@sweethub.ng</a> or via WhatsApp at +234 902 970 2549.</p>
+          <p>If you have any questions about this privacy policy or want to request the deletion of your data, please contact us at <a href="mailto:hello@jovlora.ng">hello@jovlora.ng</a> or via WhatsApp at +234 902 970 2549.</p>
         </div>
       </div>
 

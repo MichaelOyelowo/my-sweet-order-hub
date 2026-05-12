@@ -54,7 +54,7 @@ export default function NavbarMobile({ cartCount, user, displayName, avatar, onL
     <nav className="m-navbar" role="navigation">
       <div className="m-navbar-bar">
         <div className="m-navbar-logo">
-          <img src={logo} alt="SweetHUB Logo" onClick={() => handleNav('/')} style={{ cursor: 'pointer' }} />
+          <img src={logo} alt="Jovlora Logo" onClick={() => handleNav('/')} style={{ cursor: 'pointer' }} />
         </div>
 
         <div className="m-navbar-icons">

@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
+import SEO from '../components/SEO'
+
+// inside return(), first child:
+
 
 const WHATSAPP = '2349029702549'
 
@@ -40,9 +44,9 @@ const CONTACT_INFO =[
       </svg>
     ),
     label: 'Email',
-    value: 'hello@sweethub.ng',
+    value: 'hello@jovlora.ng',
     sub: 'We reply within the hour',
-    href: 'mailto:hello@sweethub.ng',
+    href: 'mailto:hello@jovlora.ng',
     color: '#c0392b',
     bg: 'rgba(192,57,43,0.08)',
   },
@@ -87,12 +91,12 @@ export default function ContactPage() {
     if (!form.name || !form.message) return
 
     const msg =
-      `Hello SweetHUB! I'd like to get in touch.\n\n` +
+      `Hello Jovlora! I'd like to get in touch.\n\n` +
       `*Name:* ${form.name}\n` +
       `${form.phone   ? `*Phone:* ${form.phone}\n`     : ''}` +
       `${form.subject ? `*Subject:* ${form.subject}\n` : ''}` +
       `\n*Message:*\n${form.message}\n\n` +
-      `Sent via sweethubs.netlify.app`
+      `Sent via jovlora.ng`
 
     window.open(
       `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,
@@ -108,6 +112,11 @@ export default function ContactPage() {
 
   return (
     <>
+    <SEO
+    title="Contact Us"
+    description="Get in touch with Jovlora. Order via WhatsApp, email us, or visit us in Ile-Ife, Osun State, Nigeria."
+    url="/contact"
+    />
       <main className="contact-page">
 
         {/* ── Hero banner ── */}

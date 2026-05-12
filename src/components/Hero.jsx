@@ -202,7 +202,7 @@ function Hero() {
 
         {/* ── Left side ── */}
         <div className="hero-left">
-          <p className="hero-tag">The Artisanal Snack Shop</p>
+          <p className="hero-tag">Every Bite, a Different Delight</p>
           <h1 className="hero-h1"> Satisfy Your<br />
             <span className="hero-scribble">Cravings</span> with<br />
             <span className={`hero-changing ${visible ? 'visible' : ''}`}>

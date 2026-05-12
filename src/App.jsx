@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import SEO from './components/SEO'
 import Navbar from './components/Navbar'
 import NavbarMobile from './components/NavbarMobile'
 import Hero from './components/Hero'
@@ -23,6 +24,7 @@ import AuthModal from './components/AuthModal'
 import { useAuth } from './hooks/useAuth'
 import './App.css'
 
+
 // ──────────────────────────────────────────────────────────────
 // Layout wrappers — pure presentation, no hooks here
 // ──────────────────────────────────────────────────────────────
@@ -32,6 +34,7 @@ function MainSite({
 }) {
   return (
     <>
+      <SEO />
       <Navbar
         cartCount={cartCount}
         user={user}
@@ -187,8 +190,6 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter>
       <AppContent />
-    </BrowserRouter>
   )
 }

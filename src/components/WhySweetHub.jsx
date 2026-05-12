@@ -11,7 +11,7 @@ import janet from '../assets/homepage/janet.webp'
 
 // ── Typewriter lines ──────────────────────────────────────────
 const LINES = [
-  { text: '> Why choose SweetHUB?',          color: '#ffb84d', speed: 55 },
+  { text: '> Why choose Jovlora?',          color: '#ffb84d', speed: 55 },
   { text: '  Because we bake fresh.',         color: '#fffdfa', speed: 60 },
   { text: '  Every. Single. Day.',            color: '#e74c3c', speed: 80 },
   { text: '',                                 color: '',        speed: 0  },
@@ -41,7 +41,7 @@ const CUSTOMERS = [
     location: 'Ojaja',
     img: amaka,
     color: '#c0392b',
-    review: "SweetHUB puff puff hits different. I can't order from anywhere else anymore!",
+    review: "Jovlora puff puff hits different. I can't order from anywhere else anymore!",
     order: 'Puff Puff x 50',
     rating: 5,
   },
@@ -51,7 +51,7 @@ const CUSTOMERS = [
     location: 'Lekki',
     img: tunde,
     color: '#e67e22',
-    review: "Ordered sweethub chin-chin for my office staff. Everyone finished it in 10 minutes. Reordering!",
+    review: "Ordered jovlora chin-chin for my office staff. Everyone finished it in 10 minutes. Reordering!",
     order: 'Chin-Chin x 100',
     rating: 5,
   },
@@ -81,7 +81,7 @@ const CUSTOMERS = [
     location: 'Ikeja',
     img: janet,
     color: '#2980b9',
-    review: "Wedding snacks sorted! 200 guests, zero complaints. SweetHUB saved my wedding.",
+    review: "Wedding snacks sorted! 200 guests, zero complaints. Jovlora saved my wedding.",
     order: 'Bulk Order',
     rating: 5,
   },
@@ -407,11 +407,11 @@ export default function WhySweetHUB() {
       className="why-section"
       id="why-sweethub"
       ref={sectionRef}
-      aria-label="Why choose SweetHUB"
+      aria-label="Why choose Jovolora"
     >
 
       <div className="why-header">
-        <p className="why-eyebrow">The SweetHUB Difference</p>
+        <p className="why-eyebrow">The Jovlora Difference</p>
         <h2 className="why-heading">
           Why thousands choose <em>us</em>
         </h2>
@@ -429,7 +429,7 @@ export default function WhySweetHUB() {
                 <span className="wtd wtd-yellow" />
                 <span className="wtd wtd-green"  />
               </div>
-              <span className="why-terminal-title">sweethub — fresh_batch.log</span>
+              <span className="why-terminal-title">jovlora — fresh_batch.log</span>
               <span className="why-terminal-tag">
                 {isFinished ? '✓ done' : '● running'}
               </span>
@@ -467,7 +467,7 @@ export default function WhySweetHUB() {
 
             <div className="why-terminal-footer">
               <span className="wtf-dot" />
-              <span>SweetHUB v1.0 · Ile-Ife, Nigeria</span>
+              <span>Jovlora v1.0 · Ile-Ife, Nigeria</span>
             </div>
 
           </div>

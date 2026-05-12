@@ -18,7 +18,7 @@ export default function ReturnPage() {
       <div className="legal-container">
         <div className="legal-content">
           <h2>1. Perishable Goods Policy</h2>
-          <p>Because SweetHUB provides freshly baked, perishable food items, <strong>we do not accept physical returns</strong> of our products once they have been delivered and accepted.</p>
+          <p>Because Jovlora provides freshly baked, perishable food items, <strong>we do not accept physical returns</strong> of our products once they have been delivered and accepted.</p>
 
           <h2>2. Order Cancellations</h2>
           <ul>

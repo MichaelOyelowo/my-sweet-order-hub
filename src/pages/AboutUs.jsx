@@ -10,14 +10,10 @@ import {
   Quote,
   ChevronRight,
 } from 'lucide-react'
+import SEO from '../components/SEO'
 import Footer from '../components/Footer'
 import michael from '../assets/team/michael.webp'
 
-// ── Team data ─────────────────────────────────────────────────
-// When ready, import real photos and assign to `img`
-// import joy from '../assets/team/joy.webp'
-// import michael from '../assets/team/michael.webp'
-// import janet from '../assets/team/janet.webp'
 
 const TEAM = [
   {
@@ -26,8 +22,8 @@ const TEAM = [
     img: null,
     initials: 'JY',
     story: [
-      "Joy founded SweetHUB on a single conviction: that pastry, when made with discipline and intention, becomes a form of hospitality.",
-      "Trained through years of self-directed practice and refined by an exacting standard for ingredients and technique, she leads our kitchen and oversees every recipe that bears the SweetHUB name.",
+      "Joy founded Jovlora on a single conviction: that pastry, when made with discipline and intention, becomes a form of hospitality.",
+      "Trained through years of self-directed practice and refined by an exacting standard for ingredients and technique, she leads our kitchen and oversees every recipe that bears the Jovlora name.",
       "Her work is governed by a simple principle — consistency is non-negotiable, and quality is never delegated.",
     ],
     quote: 'We do not bake to impress. We bake to be trusted.',
@@ -39,7 +35,7 @@ const TEAM = [
     img: michael,
     initials: 'MO',
     story: [
-      "Michael leads strategy, brand, and growth at SweetHUB. A 2024 graduate of Obafemi Awolowo University, he established the company to bring structured, reliable pastry delivery to a market that had long lacked it.",
+      "Michael leads strategy, brand, and growth at Jovlora. A 2024 graduate of Obafemi Awolowo University, he established the company to bring structured, reliable pastry delivery to a market that had long lacked it.",
       "He oversees the company's operations, technology, and customer experience — building the systems that allow craftsmanship to scale without compromise.",
       "His role is to ensure that every part of the business outside the kitchen meets the same standard as the work inside it.",
     ],
@@ -54,7 +50,7 @@ const TEAM = [
     story: [
       "Janet leads procurement, inventory, and daily operations. She is responsible for ensuring that every ingredient meets our specification and that the kitchen never operates below capacity.",
       "Her work spans supplier relationships, quality auditing, and the operational rhythm that allows the team to deliver consistently, day after day.",
-      "She is the operational backbone of SweetHUB — quiet, methodical, and indispensable.",
+      "She is the operational backbone of Jovlora — quiet, methodical, and indispensable.",
     ],
     quote: 'Excellence in the final product begins with discipline in the supply chain.',
     expertise: ['Procurement', 'Supply Chain', 'Quality Auditing', 'Daily Operations'],
@@ -62,7 +58,7 @@ const TEAM = [
 ]
 
 const MILESTONES = [
-  { year: '2024', event: 'SweetHUB founded in Ile-Ife, Osun State.' },
+  { year: '2024', event: 'Jovlora founded in Ile-Ife, Osun State.' },
   { year: '2024', event: 'First commercial deliveries launched.' },
   { year: '2025', event: 'Online ordering platform released at sweethub.ng.' },
   { year: '2025', event: 'Crossed 2,400 served customers and 5,000 fulfilled orders.' },
@@ -205,6 +201,18 @@ function TeamCard({ member }) {
 export default function AboutUs() {
   return (
     <>
+    <SEO
+      title="About Us — Our Story"
+      description="Meet Joy, Michael and Janet — the team behind Jovlora. Fresh snacks made with love in Ile-Ife since 2024."
+      url="/about"
+      schema={{
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "name": "About Jovlora",
+        "description": "The story of Jovlora — founded by Joy Yaya and Michael Oyelowo in Ile-Ife, Nigeria.",
+        "url": "https://jovloras.netlify.app/about"
+          }}
+    />
       <main className="about-page">
 
         {/* ── Hero ── */}
@@ -224,7 +232,7 @@ export default function AboutUs() {
             </h1>
 
             <p className="about-hero-sub">
-              SweetHUB is an independent pastry company founded on the conviction that
+              Jovlora is an independent pastry company founded on the conviction that
               consistency, freshness, and reliability should not be exceptional —
               they should be the baseline.
             </p>
@@ -252,7 +260,7 @@ export default function AboutUs() {
               </h2>
 
               <p>
-                SweetHUB began with a clear observation: residents of Ile-Ife had
+                Jovlora began with a clear observation: residents of Ile-Ife had
                 limited access to pastry of dependable quality, prepared the same day,
                 and delivered within a window they could plan around.
               </p>
@@ -302,7 +310,7 @@ export default function AboutUs() {
               Three founders. <em>One standard.</em>
             </h2>
             <p className="about-team-sub">
-              SweetHUB is operated end-to-end by its founders. Every order you place is
+              Jovlora is operated end-to-end by its founders. Every order you place is
               produced, packed, and accounted for by the same three people.
             </p>
           </div>

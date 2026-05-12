@@ -170,7 +170,7 @@ export default function AuthModal({ open, mode = 'login', onClose }) {
           {tab === 'signup' ? (
             <>Already have an account? <button onClick={() => setTab('login')}>Log in</button></>
           ) : (
-            <>New to SweetHUB? <button onClick={() => setTab('signup')}>Sign up</button></>
+            <>New to Jovlora? <button onClick={() => setTab('signup')}>Sign up</button></>
           )}
         </div>
       </div>

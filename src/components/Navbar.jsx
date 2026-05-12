@@ -56,7 +56,7 @@ function Navbar({ cartCount, user, displayName, avatar, onLogin, onSignup, onLog
         <div className="navbar-logo">
           <img
             src={logo}
-            alt="SweetHUB Logo"
+            alt="Jovlora Logo"
             onClick={() => handleNav('/')}
             style={{ cursor: 'pointer' }}
           />

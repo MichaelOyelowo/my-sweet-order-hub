@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 
 // ── Config ────────────────────────────────────────────────────
 const POPUP_DELAY = 5 * 60 * 1000  // 5 mins testing → change to 10 * 60 * 1000 for production
-const STORAGE_KEY = 'sweethub_game_shown'
+const STORAGE_KEY = 'jovlora_game_shown'
 const WHATSAPP    = '2349029702549'
 const fmt         = (n) => '₦' + n.toLocaleString()
 

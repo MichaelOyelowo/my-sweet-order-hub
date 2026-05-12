@@ -266,7 +266,7 @@ export default function TrackOrderPage() {
       <div className="track-page-header">
         <div className="track-page-header-inner">
           <button className="track-back-btn" onClick={() => navigate('/')}>
-             ← Back to SweetHUB
+             ← Back to Jovlora
           </button>
           <h1 className="track-page-title">Track Your Order</h1>
         </div>

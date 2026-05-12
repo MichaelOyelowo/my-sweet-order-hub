@@ -18,7 +18,7 @@ export default function TermsPage() {
       <div className="legal-container">
         <div className="legal-content">
           <h2>1. Agreement to Terms</h2>
-          <p>By accessing our website and placing an order with SweetHUB, you agree to be bound by these Terms of Service. If you disagree with any part of these terms, you may not access our services.</p>
+          <p>By accessing our website and placing an order with Jovlora, you agree to be bound by these Terms of Service. If you disagree with any part of these terms, you may not access our services.</p>
 
           <h2>2. Orders and Pricing</h2>
           <ul>

@@ -11,7 +11,7 @@ const MESSAGES = [
   { from: 'typing', delay: 4200 },
   { from: 'friend1', text: 'Honestly anything sweet at this point 😩🍰', delay: 5200 },
   { from: 'typing', delay: 6200 },
-  { from: 'friend2', text: 'Okay wait, have you tried SweetHUB?? 👀', delay: 7200, tick: 8000 },
+  { from: 'friend2', text: 'Okay wait, have you tried Jovlora?? 👀', delay: 7200, tick: 8000 },
   { from: 'friend1', text: 'No what is that??', delay: 8200 },
   { from: 'typing', delay: 9200 },
   { from: 'friend2', text: 'They deliver cakes, chin-chin, chocolates, everything fresh to your door — for events or just yourself 🛒🍫', delay: 10200, tick: 11200 },
@@ -21,7 +21,7 @@ const MESSAGES = [
 ]
 
 const SLIDES = [
-  { img: gallery1, caption: 'Happy customer receiving SweetHUB order', badge: '✨ Just Delivered!' },
+  { img: gallery1, caption: 'Happy customer receiving Jovlora order', badge: '✨ Just Delivered!' },
   { img: gallery2, caption: 'Fresh from the oven, made with love', badge: '🍰 Freshly Baked' },
   { img: gallery3, caption: 'Fast delivery to your doorstep', badge: '🚀 30-min Delivery' },
 ]
@@ -210,7 +210,7 @@ function ChatStory() {
           <em>we've got you covered</em>
         </h2>
         <p className="chat-story-sub">
-          From that late-night craving to a surprise treat — SweetHUB delivers happiness, fresh and fast.
+          From that late-night craving to a surprise treat — Jovlora delivers happiness, fresh and fast.
         </p>
       </div>
 

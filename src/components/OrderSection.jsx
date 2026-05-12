@@ -211,7 +211,7 @@ const PRODUCTS = [
 
 const CATEGORIES     = ['All', 'Snacks', 'Pies', 'Cakes']
 const WHATSAPP_NUMBER = '2349029702549'
-const STORAGE_KEY    = 'sweethub_cart'
+const STORAGE_KEY    = 'jovlora_cart'
 const fmt = (n) => '₦' + n.toLocaleString()
 
 const UPSELL_MSGS = [
@@ -430,7 +430,7 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
         <p style="margin:0 0 4px;font-size:13px;color:#888;">Questions? WhatsApp us at
           <a href="https://wa.me/2349029702549" style="color:#c0392b;text-decoration:none;font-weight:600;">+234 902 970 2549</a>
         </p>
-        <p style="margin:0;font-size:11px;color:#bbb;">© ${new Date().getFullYear()} SweetHUB · Fresh & Made to Order</p>
+        <p style="margin:0;font-size:11px;color:#bbb;">© ${new Date().getFullYear()} Jovlora · Fresh & Made to Order</p>
       </td></tr>
     </table></td></tr>
   </table>
@@ -441,9 +441,9 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from:    'SweetHUB <onboarding@resend.dev>',
+          from:    'Jovlora <onboarding@resend.dev>',
           to:      [form.email],
-          subject: `Order ${orderRef} Confirmed 🎉 – SweetHUB`,
+          subject: `Order ${orderRef} Confirmed 🎉 – Jovlora`,
           html,
         }),
       })
