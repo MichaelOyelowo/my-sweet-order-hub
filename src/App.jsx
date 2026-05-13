@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import SEO from './components/SEO'
 import Navbar from './components/Navbar'
 import NavbarMobile from './components/NavbarMobile'
 import Hero from './components/Hero'
@@ -34,7 +33,6 @@ function MainSite({
 }) {
   return (
     <>
-      <SEO />
       <Navbar
         cartCount={cartCount}
         user={user}

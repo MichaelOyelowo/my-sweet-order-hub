@@ -15,6 +15,8 @@ import imgBananaBread2 from '../assets/banana-breads/banana-bread5.webp'
 import imgFishRoll1    from '../assets/fish-roll/fish-roll1.webp'
 import imgFishRoll2    from '../assets/fish-roll/fish-roll4.webp'
 import imgFishRoll3    from '../assets/fish-roll/fish-roll5.webp'
+import imgBakedFishRoll1    from '../assets/fish-roll/baked-fish-roll.webp'
+import imgBakedFishRoll2    from '../assets/fish-roll/baked-fish-roll2.webp'
 import imgSausageRoll1 from '../assets/sausage/sausage5.webp'
 import imgSausageRoll2 from '../assets/sausage/sausage4.webp'
 import imgSausageRoll3 from '../assets/sausage/sausage2.webp'
@@ -33,6 +35,15 @@ import imgBuns3  from '../assets/buns/buns3.webp'
 import imgDoughnut1    from '../assets/doughnuts/doughnut2.webp'
 import imgDoughnut2    from '../assets/doughnuts/doughnut5.webp'
 import imgDoughnut3    from '../assets/doughnuts/doughnut6.webp'
+import imgChocolateDough1    from '../assets/doughnuts/chocolate-dough1.webp'
+import imgChocolateDough2    from '../assets/doughnuts/chocolate-dough2.webp'
+import imgChocolateDough3    from '../assets/doughnuts/chocolate-dough3.webp'
+import imgJamDough1    from '../assets/doughnuts/jam-dough1.webp'
+import imgJamDough2    from '../assets/doughnuts/jam-dough2.webp'
+import imgJamDough3    from '../assets/doughnuts/jam-dough3.webp'
+import imgMilkyDough1    from '../assets/doughnuts/milky-dough1.webp'
+import imgMilkyDough2    from '../assets/doughnuts/milky-dough2.webp'
+import imgMilkyDough3    from '../assets/doughnuts/milky-dough3.webp'
 import imgEggRoll1    from '../assets/homepage/eggroll.webp'
 import imgEggRoll2    from '../assets/homepage/egg-roll1.webp'
 import imgEggRoll3    from '../assets/homepage/egg-roll2.webp'
@@ -82,7 +93,7 @@ const PRODUCTS = [
   },
   {
     id: 3, name: 'Banana Bread', category: 'Snacks',
-    price: 200, unit: 'piece', moq: 3, pairWith: [13, 14],
+    price: 500, unit: 'piece', moq: 1, pairWith: [13, 14],
     images: [
       imgBananaBread,
       imgBananaBread1,
@@ -91,16 +102,25 @@ const PRODUCTS = [
   },
   {
     id: 4, name: 'Fish Roll', category: 'Snacks',
-    price: 200, unit: 'piece', moq: 3, pairWith: [5, 7],
+    price: 600, unit: 'piece', moq: 1, pairWith: [5, 7],
     images: [
       imgFishRoll1,
       imgFishRoll2,
       imgFishRoll3,
+      imgBakedFishRoll1 
+    ],
+  },
+   {
+    id: 5, name: 'Baked Fish Roll', category: 'Snacks',
+    price: 600, unit: 'piece', moq: 1, pairWith: [3, 9],
+    images: [
+      imgBakedFishRoll1,
+      imgBakedFishRoll2 
     ],
   },
   {
-    id: 5, name: 'Sausage Roll', category: 'Snacks',
-    price: 200, unit: 'piece', moq: 3, pairWith: [4, 6],
+    id: 6, name: 'Sausage Roll', category: 'Snacks',
+    price: 800, unit: 'piece', moq: 1, pairWith: [4, 6],
     images: [
       imgSausageRoll1,
       imgSausageRoll2,
@@ -108,8 +128,8 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 6, name: 'Samosa', category: 'Snacks',
-    price: 200, unit: 'piece', moq: 3, pairWith: [5, 10],
+    id: 7, name: 'Samosa', category: 'Snacks',
+    price: 400, unit: 'piece', moq: 2, pairWith: [5, 10],
     images: [
       imgSamosa1,
       imgSamosa2,
@@ -117,8 +137,8 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 7, name: 'Spring Roll', category: 'Snacks',
-    price: 200, unit: 'piece', moq: 3, pairWith: [5, 10],
+    id: 8, name: 'Spring Roll', category: 'Snacks',
+    price: 400, unit: 'piece', moq: 2, pairWith: [5, 10],
     images: [
       imgSpringRoll1,
       imgSpringRoll2,
@@ -126,8 +146,8 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 8, name: 'Frank Roll', category: 'Snacks',
-    price: 200, unit: 'piece', moq: 3, pairWith: [4, 11],
+    id: 9, name: 'Frank Roll', category: 'Snacks',
+    price: 800, unit: 'piece', moq: 1, pairWith: [4, 11],
     images: [
       imgFrankRoll1,
       imgFrankRoll2,
@@ -135,8 +155,8 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 9, name: 'Buns', category: 'Snacks',
-    price: 200, unit: 'piece', moq: 3, pairWith: [2, 9],
+    id: 10, name: 'Buns', category: 'Snacks',
+    price: 100, unit: 'piece', moq: 3, pairWith: [2, 9],
     images: [
       imgBuns1,
       imgBuns2,
@@ -144,7 +164,7 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 10, name: 'Doughnut', category: 'Snacks',
+    id: 11, name: 'Doughnut', category: 'Snacks',
     price: 300, unit: 'piece', moq: 2, pairWith: [13, 15],
     images: [
       imgDoughnut3,
@@ -153,7 +173,34 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 11, name: 'Egg Roll', category: 'Pies',
+    id: 12, name: 'Chocolate Doughnut', category: 'Snacks',
+    price: 1000, unit: 'piece', moq: 1, pairWith: [13, 15],
+    images: [
+      imgChocolateDough3,
+      imgChocolateDough1,
+      imgChocolateDough2
+    ],
+  },
+  {
+    id: 13, name: 'Jam Doughnut', category: 'Snacks',
+    price: 500, unit: 'piece', moq: 1, pairWith: [13, 15],
+    images: [
+      imgJamDough1,
+      imgJamDough2,
+      imgJamDough3,
+    ],
+  },
+  {
+    id: 14, name: 'Milky Doughnut', category: 'Snacks',
+    price: 1300, unit: 'piece', moq: 1, pairWith: [13, 15],
+    images: [
+      imgMilkyDough1,
+      imgMilkyDough2,
+      imgMilkyDough3,
+    ],
+  },
+  {
+    id: 15, name: 'Egg Roll', category: 'Pies',
     price: 500, unit: 'piece', moq: 1, pairWith: [11, 12],
     images: [
       imgEggRoll1,
@@ -162,8 +209,8 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 12, name: 'Meat Pie', category: 'Pies',
-    price: 500, unit: 'piece', moq: 1, pairWith: [10, 12],
+    id: 16, name: 'Meat Pie', category: 'Pies',
+    price: 1000, unit: 'piece', moq: 1, pairWith: [10, 12],
     images: [
       imgMeatPie1,
       imgMeatPie2,
@@ -171,7 +218,7 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 13, name: 'Chicken Pie', category: 'Pies',
+    id: 17, name: 'Chicken Pie', category: 'Pies',
     price: 500, unit: 'piece', moq: 1, pairWith: [10, 11],
     images: [
       imgChickenPie1,
@@ -180,7 +227,7 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 14, name: 'Small Cupcake', category: 'Cakes',
+    id: 18, name: 'Small Cupcake', category: 'Cakes',
     price: 300, unit: 'piece', moq: 2, pairWith: [14, 15],
     images: [
       imgSmallCake1,
@@ -189,7 +236,7 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 15, name: 'Medium Cupcake', category: 'Cakes',
+    id: 19, name: 'Medium Cupcake', category: 'Cakes',
     price: 500, unit: 'piece', moq: 1, pairWith: [13, 15],
     images: [
       imgMediumCake1,
@@ -198,7 +245,7 @@ const PRODUCTS = [
     ],
   },
   {
-    id: 16, name: 'Cake Parfait', category: 'Cakes',
+    id: 20, name: 'Cake Parfait', category: 'Cakes',
     price: 1500, unit: 'piece', moq: 1, pairWith: [13, 14],
     images: [
       imgParfait1,
