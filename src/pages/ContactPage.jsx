@@ -112,11 +112,11 @@ export default function ContactPage() {
 
   return (
     <>
-    <SEO
-    title="Contact Us"
-    description="Get in touch with Jovlora. Order via WhatsApp, email us, or visit us in Ile-Ife, Osun State, Nigeria."
-    url="/contact"
-    />
+     <SEO 
+        title="Contact Us" 
+        description="Have a question or want to place a bulk order? Contact Jovlora Ile-Ife via WhatsApp or Phone."
+        url="/contact"
+      />
       <main className="contact-page">
 
         {/* ── Hero banner ── */}

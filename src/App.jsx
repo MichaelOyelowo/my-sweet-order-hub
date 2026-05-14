@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import SEO from './components/SEO'
 import Navbar from './components/Navbar'
 import NavbarMobile from './components/NavbarMobile'
 import Hero from './components/Hero'
@@ -31,8 +32,56 @@ function MainSite({
   cartCount, addToCart, showCountdown, setShowCountdown,
   user, displayName, avatar, onLogin, onSignup, onLogout,
 }) {
+     const homeSchema = [
+    {
+      "@context": "https://schema.org",
+      "@type": ["FoodEstablishment", "LocalBusiness"],
+      "name": "Jovlora",
+      "description": "Handcrafted fresh snacks and baked goods delivered in under 30 minutes. Specialising in puff puff, chin-chin, cakes, meat pie, doughnuts and more.",
+      "url": "https://sweethubs.netlify.app",
+      "logo": "https://sweethubs.netlify.app/favicon.svg",
+      "image": "https://sweethubs.netlify.app/og-image.jpg",
+      "telephone": "+2349029702549",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Ile-Ife AP",
+        "addressLocality": "Ile-Ife",
+        "addressRegion": "Osun State",
+        "addressCountry": "NG"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "7.4667",
+        "longitude": "4.5557"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+          "opens": "08:00",
+          "closes": "21:00"
+        }
+      ],
+      "servesCuisine": ["Nigerian", "Pastry", "Snacks"],
+      "priceRange": "₦100 - ₦5000"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://sweethubs.netlify.app/" },
+        { "@type": "ListItem", "position": 2, "name": "Order", "item": "https://sweethubs.netlify.app/#order" }
+      ]
+    }
+  ];
+
   return (
     <>
+    <SEO 
+        title="Artisan Snacks & Baked Goods, Made Fresh Daily" 
+        description="Jovlora bakes Nigeria's favourite snacks — puff puff, chin-chin, meat pie, doughnuts and signature cakes, delivered to your door in Ile-Ife in under 30 minutes."
+        schema={homeSchema}
+      />
       <Navbar
         cartCount={cartCount}
         user={user}

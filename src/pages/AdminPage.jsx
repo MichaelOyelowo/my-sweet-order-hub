@@ -328,7 +328,7 @@ export default function AdminPage() {
     return (
       <div className="admin-login">
         <div className="admin-login-card">
-          <div className="admin-login-logo"><img src={logo} alt="jovlora logo" /></div>
+          <div className="admin-login-logo"><img src={logo} alt="jovlora logo" style={{ width: "120px", height: "auto" }} /></div>
           <h1 className="admin-login-title">Jovlora Admin</h1>
           <p className="admin-login-sub">Enter your password to access the dashboard</p>
           <div className={`admin-login-field ${pwError ? 'error' : ''}`}>

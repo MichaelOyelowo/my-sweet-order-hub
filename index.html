@@ -3,205 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- ── Primary SEO ── -->
-    <title>Jovlora | Artisan Snacks & Baked Goods, Made Fresh Daily</title>
-    <meta name="description" content="Jovlora bakes Nigeria's favourite snacks the honest way — puff puff, chin-chin, meat pie, doughnuts and signature cakes, handcrafted every morning and delivered warm and delivered to your door in under 30 minutes.. Proudly born in Ile-Ife, growing across Nigeria." />
-    <meta name="keywords" content="fresh snacks Ile-Ife, puff puff delivery, chin-chin, meat pie, cakes, doughnuts, baked goods Nigeria, snack delivery Osun, Jovlora" />
-    <meta name="author" content="Jovlora" />
-    <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#c0392b" />
-    <link rel="canonical" href="https://sweethubs.netlify.app/" /> 
+    <meta name="apple-mobile-web-app-title" content="Jovlora" />
 
-    <!-- ── Open Graph (Facebook, WhatsApp, LinkedIn previews) ── -->
-    <meta property="og:type"        content="website" />
-    <meta property="og:url"         content="https://sweethubs.netlify.app/" />
-    <meta property="og:title"       content="Jovlora | Fresh Snacks Delivered in Ile-Ife" />
-    <meta property="og:description" content="Puff puff, chin-chin, cakes, meat pie and more. Fresh daily, delivered in 30 minutes. Order now via WhatsApp!" />
-    <meta property="og:image"       content="https://sweethubs.netlify.app/og-image.png" />
-    <meta property="og:image:width"  content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt"    content="Jovlora fresh snacks and baked goods" />
-    <meta property="og:site_name"   content="Jovlora" />
-    <meta property="og:locale"      content="en_NG" />
-
-    <!-- ── Twitter / X Card ── -->
-    <meta name="twitter:card"        content="summary_large_image" />
-    <meta name="twitter:url"         content="https://sweethubs.netlify.app/" />
-    <meta name="twitter:title"       content="Jovlora | Fresh Snacks Delivered in Ile-Ife" />
-    <meta name="twitter:description" content="Puff puff, chin-chin, cakes, meat pie and more. Fresh daily, delivered in 30 minutes!" />
-    <meta name="twitter:image"       content="https://sweethubs.netlify.app/og-image.png" />
-
-    <!-- ── WhatsApp specific (uses og: tags but needs these) ── -->
-    <meta property="og:phone_number" content="+2349029702549" />
-
-    <!-- ── Favicon ── -->
+    <!-- Favicon & Manifest -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- ── Performance: DNS prefetch ── -->
-    <link rel="dns-prefetch"    href="//fonts.googleapis.com" />
-    <link rel="dns-prefetch"    href="//fonts.gstatic.com" />
-    <link rel="dns-prefetch"    href="//wa.me" />
-
-    <!-- ── Fonts ── -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- ── Structured Data — LocalBusiness + FoodEstablishment ── -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": ["FoodEstablishment", "LocalBusiness"],
-      "name": "Jovlora",
-      "alternateName": "Jovlora Ile-Ife",
-      "description": "Handcrafted fresh snacks and baked goods delivered in under 30 minutes. Specialising in puff puff, chin-chin, cakes, meat pie, doughnuts and more.",
-      "url": "https://sweethubs.netlify.app",
-      "logo": "https://sweethubs.netlify.app/favicon.svg",
-      "image": "https://sweethubs.netlify.app/og-image.jpg",
-      "telephone": "+2349029702549",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+2349029702549",
-        "contactType": "customer service",
-        "contactOption": "TollFree",
-        "availableLanguage": ["English", "Yoruba"]
-      },
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Ile-Ife AP",
-        "addressLocality": "Ile-Ife",
-        "addressRegion": "Osun State",
-        "addressCountry": "NG"
-      },
-      "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": "7.4667",
-        "longitude": "4.5557"
-      },
-      "openingHoursSpecification": [
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-          "opens": "08:00",
-          "closes": "21:00"
-        }
-      ],
-      "servesCuisine": ["Nigerian", "Pastry", "Snacks"],
-      "menu": "https://sweethubs.netlify.app/#order",
-      "hasMap": "https://maps.google.com/?q=Ile-Ife,Osun,Nigeria",
-      "priceRange": "₦100 - ₦5000",
-      "currenciesAccepted": "NGN",
-      "paymentAccepted": "Bank Transfer, Cash on Delivery",
-      "areaServed": {
-        "@type": "City",
-        "name": "Ile-Ife"
-      },
-      "sameAs": [
-        "https://instagram.com/jovlora",
-        "https://wa.me/2349029702549",
-        "https://facebook.com/jovlora",
-        "https://tiktok.com/@jovlora"
-      ],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "2400",
-        "bestRating": "5",
-        "worstRating": "1"
-      },
-      "founder": [
-        {
-          "@type": "Person",
-          "name": "Joy Yaya",
-          "jobTitle": "Head Chef, Founder & Baker"
-        },
-        {
-          "@type": "Person",
-          "name": "Michael Oyelowo",
-          "jobTitle": "Chief Architect & Growth Strategist",
-          "alumniOf": "Obafemi Awolowo University"
-        }
-      ],
-      "offers": [
-        {
-          "@type": "Offer",
-          "name": "Puff Puff",
-          "price": "100",
-          "priceCurrency": "NGN",
-          "availability": "https://schema.org/InStock"
-        },
-        {
-          "@type": "Offer",
-          "name": "Chin-Chin",
-          "price": "100",
-          "priceCurrency": "NGN",
-          "availability": "https://schema.org/InStock"
-        },
-        {
-          "@type": "Offer",
-          "name": "Meat Pie",
-          "price": "500",
-          "priceCurrency": "NGN",
-          "availability": "https://schema.org/InStock"
-        },
-        {
-          "@type": "Offer",
-          "name": "Custom Cake",
-          "price": "5000",
-          "priceCurrency": "NGN",
-          "availability": "https://schema.org/InStock"
-        }
-      ]
-    }
-    </script>
-
-    <!-- ── BreadcrumbList schema ── -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://sweethubs.netlify.app/"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "name": "Order Snacks",
-          "item": "https://sweethubs.netlify.app/#order"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "name": "About Us",
-          "item": "https://sweethubs.netlify.app/about"
-        },
-        {
-          "@type": "ListItem",
-          "position": 4,
-          "name": "Contact",
-          "item": "https://sweethubs.netlify.app/contact"
-        },
-        {
-          "@type": "ListItem",
-          "position": 5,
-          "name": "Games",
-          "item": "https://sweethubs.netlify.app/games"
-        }
-      ]
-    }
-    </script>
-
+    <!-- ── PERFORMANCE & FONTS ── -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+  <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+  <link rel="dns-prefetch" href="//wa.me" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>

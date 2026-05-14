@@ -2,6 +2,14 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabaseClient'
 
+import { 
+  Trophy, Clock, Timer, Hash, MousePointer2, 
+  Gamepad2, Clipboard, CheckCircle2, Lock, 
+  ArrowLeft, RefreshCw, Smartphone, Zap, 
+  ShoppingBasket, Lightbulb, ExternalLink,
+  Gift, Percent, Truck, Cookie
+} from 'lucide-react'
+
 const WHATSAPP = '2349029702549'
 const fmt      = (n) => '₦' + n.toLocaleString()
 
