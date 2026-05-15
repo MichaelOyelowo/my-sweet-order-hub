@@ -227,7 +227,7 @@ function Hero() {
           </div>
 
           <div className="hero-btns">
-            <a href='#order' className="hero-btn-primary">Shop Now</a>
+            <a href='#order' className="hero-btn-primary">Browse Snacks</a>
             <a href='#order' className="hero-btn-secondary">View Menu</a>
           </div>
 

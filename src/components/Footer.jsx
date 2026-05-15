@@ -5,7 +5,7 @@ import logo from '../assets/jovlora.png'
 
 const QUICK_LINKS =[
   { label: 'Home',         href: '#'            },
-  { label: 'Shop',         href: '#order'        },
+  { label: 'Snacks',       href: '#order'        },
   { label: 'Games',      href: '/games'       },
   { label: 'Custom Order', href: '#custom-order' },
   { label: 'About Us',     href: '/about'            },

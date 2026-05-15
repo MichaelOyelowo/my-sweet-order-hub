@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useSearch } from '../context/SearchContext'
+import SearchBox from './SearchBox'
 import logo from '../assets/jovlora.png'
 
 function Navbar({ cartCount, user, displayName, avatar, onLogin, onSignup, onLogout }) {
@@ -9,7 +11,7 @@ function Navbar({ cartCount, user, displayName, avatar, onLogin, onSignup, onLog
 
   const links = [
     { label: 'Home',        path: '/'           },
-    { label: 'Shop',        path: '/#order'     },
+    { label: 'Snacks',      path: '/#order'     },
     { label: 'About',       path: '/about'      },
     { label: 'Contact',     path: '/contact'    },
     { label: 'Games',       path: '/games'      },
@@ -81,15 +83,7 @@ function Navbar({ cartCount, user, displayName, avatar, onLogin, onSignup, onLog
         <div className="navbar-right">
 
           {/* Search */}
-          <div className="navbar-search" role="search">
-            <label htmlFor="search-input" className="sr-only">Search snacks</label>
-            <input id="search-input" type="text" placeholder="Search snacks..." aria-label="Search snacks" />
-            <button className="search-icon" aria-label="Submit search">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#2c2323">
-                <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
-              </svg>
-            </button>
-          </div>
+          <SearchBox />
 
           {/* Cart */}
           <button

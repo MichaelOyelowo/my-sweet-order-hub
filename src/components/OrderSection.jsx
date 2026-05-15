@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
+import { useSearch } from '../context/SearchContext'
 
 // ── Images ────────────────────────────────────────────────────
 import imgPuffPuff    from '../assets/homepage/puff-puff-pepper.webp'
@@ -545,7 +546,7 @@ function CheckoutModal({ cartItems, onClose, onSuccess }) {
       .join('\n')
 
     const msg =
-      `Hello SweetHUB! 🍰 I just placed an order:\n\n` +
+      `Hello Jovlora! 🍰 I just placed an order:\n\n` +
       `🔖 Order Ref: *${orderRef}*\n\n${lines}\n\n` +
       `*Total: ₦${total.toLocaleString()}*\n\n` +
       `👤 Name: ${form.name}\n📞 Phone: ${form.phone}\n📍 Address: ${form.address}\n` +
@@ -707,6 +708,7 @@ function CartDrawer({ isOpen, onClose, cartItems, onRemove, onCheckout }) {
 
 // ── Main Order Section ────────────────────────────────────────
 function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
+  const { searchTerm, isSearching, highlightId, clearSearch } = useSearch()
   const [quantities, setQuantities]         = useState({})
   const [activeCategory, setActiveCategory] = useState('All')
   const [moqErrors, setMoqErrors]           = useState({})
@@ -729,9 +731,14 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
     return () => window.removeEventListener('sweethub:openCart', handler)
   }, [])
 
-  const filtered = PRODUCTS.filter(p =>
-    activeCategory === 'All' ? true : p.category === activeCategory
-  )
+const filtered = PRODUCTS.filter(p => {
+  const matchCategory = activeCategory === 'All' ? true : p.category === activeCategory
+  const matchSearch   = !searchTerm
+    ? true
+    : p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.category.toLowerCase().includes(searchTerm.toLowerCase())
+  return matchCategory && matchSearch
+})
 
   const setQty = (id, value) => {
     const product = PRODUCTS.find(p => p.id === id)
@@ -839,6 +846,28 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
             </button>
           )}
         </div>
+        {isSearching && (
+        <div className="search-results-banner">
+          <div className="srb-left">
+            <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentColor">
+              <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
+            </svg>
+            <span>
+              {filtered.length} result{filtered.length !== 1 ? 's' : ''} for "<strong>{searchTerm}</strong>"
+            </span>
+          </div>
+          <button className="srb-clear" onClick={clearSearch}>Clear ×</button>
+        </div>
+      )}
+
+      {filtered.length === 0 && isSearching && (
+        <div className="search-empty-state">
+          <span className="ses-icon">🔍</span>
+          <h3>No results for "{searchTerm}"</h3>
+          <p>Try: puff puff, doughnut, cake, meat pie...</p>
+          <button className="ses-clear-btn" onClick={clearSearch}>Show all products</button>
+        </div>
+      )}
 
         <div className="product-cards-grid">
           {filtered.map(product => {
@@ -849,7 +878,14 @@ function OrderSection({ onAddToCart, showCountdown, setShowCountdown }) {
             const inCart   = cartItems.some(i => i.id === product.id)
 
             return (
-              <div key={product.id} className={`product-card ${inCart ? 'in-cart' : ''}`}>
+                <div
+                  key={product.id}
+                  id={`product-card-${product.id}`}
+                  className={`product-card
+                    ${inCart ? 'in-cart' : ''}
+                    ${highlightId === product.id ? 'search-highlight' : ''}
+                  `}
+                >
 
                 {/* ── Image cycler replaces old pc-img-wrap ── */}
                 <ProductImageCycler
