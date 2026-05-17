@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import SEO from './components/SEO'
+import JovBot from './components/JovBot'
 import Navbar from './components/Navbar'
 import NavbarMobile from './components/NavbarMobile'
 import Hero from './components/Hero'
@@ -221,7 +222,7 @@ function AppContent() {
         <Route path="/track-order" element={<TrackOrderLayout cartCount={cartCount} {...sharedNavProps} />} />
         <Route path="/admin"       element={<AdminPage />} />
       </Routes>
-
+      <JovBot />
       {/* ✅ One AuthModal, with the props AuthModal.jsx actually expects */}
       <AuthModal
         open={authOpen}
